@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/meanie-angular-form-controls.svg)](https://www.npmjs.com/package/meanie-angular-form-controls)
 [![node dependencies](https://david-dm.org/meanie/angular-form-controls.svg)](https://david-dm.org/meanie/angular-form-controls)
 [![github issues](https://img.shields.io/github/issues/meanie/angular-form-controls.svg)](https://github.com/meanie/angular-form-controls/issues)
-[![codacy](https://img.shields.io/codacy/b747cecb5c144b9ba982c5f63d5798a5.svg)](https://www.codacy.com/app/meanie/angular-form-controls)
+[![codacy](https://img.shields.io/codacy/94eeaafada4e4e7ebc9f1689f151c4e7.svg)](https://www.codacy.com/app/meanie/angular-form-controls)
 [![Join the chat at https://gitter.im/meanie/meanie](https://img.shields.io/badge/gitter-join%20chat%20%E2%86%92-brightgreen.svg)](https://gitter.im/meanie/meanie?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A set of form control components for Angular 1 (select box, check boxes, radio buttons)
