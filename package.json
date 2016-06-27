@@ -1,7 +1,7 @@
 {
   "name": "meanie-angular-form-controls",
   "description": "A set of form control components for Angular 1 (select box, check boxes, radio buttons)",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://github.com/meanie/angular-form-controls",
   "author": {
     "name": "Adam Buczynski",
