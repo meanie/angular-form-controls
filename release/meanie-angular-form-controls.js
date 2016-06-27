@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.0.1 - 27-5-2016
+ * meanie-angular-form-controls - v1.0.2 - 27-5-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -59,7 +59,7 @@
    * Checkbox component
    */
   .component('checkBox', {
-    template: '\n    <label class="check-box"\n      ng-transclude\n      ng-click="$ctrl.toggle()"\n      ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"\n    ></label>\n  ',
+    template: '<label class="check-box"\n      ng-transclude\n      ng-click="$ctrl.toggle()"\n      ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"\n    ></label>',
     require: {
       ngModel: 'ngModel'
     },
@@ -150,7 +150,7 @@
    * Checkboxes component
    */
   .component('checkBoxes', {
-    template: '\n    <div class="check-box-group {{$ctrl.classes}}">\n      <label class="check-box"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.toggle(option, $index)"\n        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>\n  ',
+    template: '<div class="check-box-group {{$ctrl.classes}}">\n      <label class="check-box"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.toggle(option, $index)"\n        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
     require: {
       ngModel: 'ngModel'
     },
@@ -368,7 +368,7 @@
    * Radio buttons component
    */
   .component('radioButtons', {
-    template: '\n    <div class="radio-button-group {{$ctrl.classes}}">\n      <label class="radio-button"\n        ng-if="$ctrl.isNullable"\n        ng-click="$ctrl.select(null)"\n        ng-class="{checked: $ctrl.isSelected(null), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.nullLabel}}</label>\n      <label class="radio-button"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.select(option, $index)"\n        ng-class="{checked: $ctrl.isSelected(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>\n  ',
+    template: '<div class="radio-button-group {{$ctrl.classes}}">\n      <label class="radio-button"\n        ng-if="$ctrl.isNullable"\n        ng-click="$ctrl.select(null)"\n        ng-class="{checked: $ctrl.isSelected(null), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.nullLabel}}</label>\n      <label class="radio-button"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.select(option, $index)"\n        ng-class="{checked: $ctrl.isSelected(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
     require: {
       ngModel: 'ngModel'
     },
@@ -612,7 +612,7 @@
    * Selectbox component
    */
   .component('selectBox', {
-    template: '\n    <div class="select-box {{$ctrl.classes}}">\n      <div class="form-control-wrapper clickable" ng-click="$ctrl.toggleOptions()">\n        <span class="form-control-spinner" ng-class="{\'show-spinner\': $ctrl.hasSpinner}">\n          <span class="caret"\n            ng-click="$ctrl.toggleOptions(); $event.stopPropagation();"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-if="!$ctrl.hasSpinner"\n          ></span>\n          <input readonly class="form-control" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </span>\n      </div>\n      <ul class="select-box-options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1)"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>\n  ',
+    template: '<div class="select-box {{$ctrl.classes}}">\n      <div class="form-control-wrapper clickable" ng-click="$ctrl.toggleOptions()">\n        <span class="form-control-spinner" ng-class="{\'show-spinner\': $ctrl.hasSpinner}">\n          <span class="caret"\n            ng-click="$ctrl.toggleOptions(); $event.stopPropagation();"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-if="!$ctrl.hasSpinner"\n          ></span>\n          <input readonly class="form-control" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </span>\n      </div>\n      <ul class="select-box-options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1)"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
