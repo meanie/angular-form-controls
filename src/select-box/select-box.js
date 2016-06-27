@@ -8,8 +8,8 @@ angular.module('SelectBox.Component', [])
  * Selectbox component
  */
 .component('selectBox', {
-  template: `
-    <div class="select-box {{$ctrl.classes}}">
+  template:
+    `<div class="select-box {{$ctrl.classes}}">
       <div class="form-control-wrapper clickable" ng-click="$ctrl.toggleOptions()">
         <span class="form-control-spinner" ng-class="{'show-spinner': $ctrl.hasSpinner}">
           <span class="caret"
@@ -39,8 +39,7 @@ angular.module('SelectBox.Component', [])
           ng-click="$ctrl.confirmSelection($index)"
         >{{$ctrl.getLabel(option)}}</li>
       </ul>
-    </div>
-  `,
+    </div>`,
   transclude: true,
   require: {
     ngModel: 'ngModel'

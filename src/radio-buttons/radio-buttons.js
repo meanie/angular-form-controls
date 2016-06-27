@@ -8,8 +8,8 @@ angular.module('RadioButtons.Component', [])
  * Radio buttons component
  */
 .component('radioButtons', {
-  template: `
-    <div class="radio-button-group {{$ctrl.classes}}">
+  template:
+    `<div class="radio-button-group {{$ctrl.classes}}">
       <label class="radio-button"
         ng-if="$ctrl.isNullable"
         ng-click="$ctrl.select(null)"
@@ -20,8 +20,7 @@ angular.module('RadioButtons.Component', [])
         ng-click="$ctrl.select(option, $index)"
         ng-class="{checked: $ctrl.isSelected(option, $index), disabled: $ctrl.isDisabled}"
       >{{$ctrl.getLabel(option)}}</label>
-    </div>
-  `,
+    </div>`,
   require: {
     ngModel: 'ngModel'
   },

@@ -8,15 +8,14 @@ angular.module('CheckBoxes.Component', [])
  * Checkboxes component
  */
 .component('checkBoxes', {
-  template: `
-    <div class="check-box-group {{$ctrl.classes}}">
+  template:
+    `<div class="check-box-group {{$ctrl.classes}}">
       <label class="check-box"
         ng-repeat="option in $ctrl.options"
         ng-click="$ctrl.toggle(option, $index)"
         ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"
       >{{$ctrl.getLabel(option)}}</label>
-    </div>
-  `,
+    </div>`,
   require: {
     ngModel: 'ngModel'
   },

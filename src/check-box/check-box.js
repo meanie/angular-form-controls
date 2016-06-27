@@ -8,13 +8,12 @@ angular.module('CheckBox.Component', [])
  * Checkbox component
  */
 .component('checkBox', {
-  template: `
-    <label class="check-box"
+  template:
+    `<label class="check-box"
       ng-transclude
       ng-click="$ctrl.toggle()"
       ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"
-    ></label>
-  `,
+    ></label>`,
   require: {
     ngModel: 'ngModel'
   },
