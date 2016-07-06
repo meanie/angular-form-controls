@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.0 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.1 - 7-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1110,6 +1110,7 @@
       placeholder: '@',
       onSearch: '&',
       onChange: '&',
+      onQuery: '&',
       isDisabled: '<ngDisabled',
       isRequired: '<ngRequired',
       labelBy: '@',
@@ -1340,7 +1341,7 @@
 
         //Initialize results and flags
         this.results = [];
-        this.searchQuery = getLabelValue(this.model);
+        this.searchQuery = '';
         this.isSearching = false;
         this.isShowingResults = false;
 
@@ -1364,6 +1365,7 @@
 
         //Validate and mark as dirty if needed
         if (changes.model) {
+          this.searchQuery = getLabelValue(this.model);
           this.ngModel.$validate();
           if ($formControls.hasChanged(changes.model)) {
             this.ngModel.$setDirty();
@@ -1416,6 +1418,9 @@
 
         //Get search query
         var value = (this.searchQuery || '').trim();
+
+        //Pass via event
+        this.onQuery({ value: value });
 
         //Should we search?
         if (!this.minLength || value.length >= this.minLength) {
