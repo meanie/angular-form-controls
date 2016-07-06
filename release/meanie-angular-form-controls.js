@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.2 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.3 - 7-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1341,7 +1341,6 @@
 
         //Initialize results and flags
         this.results = [];
-        this.searchQuery = '';
         this.isSearching = false;
         this.isShowingResults = false;
 
