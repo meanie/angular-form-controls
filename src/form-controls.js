@@ -6,7 +6,8 @@ angular.module('FormControls.Component', [
   'CheckBox.Component',
   'CheckBoxes.Component',
   'RadioButtons.Component',
-  'SelectBox.Component'
+  'SelectBox.Component',
+  'TypeAhead.Component'
 ])
 
 /**

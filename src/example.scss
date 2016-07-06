@@ -186,14 +186,14 @@ $dropdownItemHeight: 2.25rem;
 }
 
 /**
- * Select box and options
+ * Select box/type ahead
  */
-.select-box {
+.select-box, .type-ahead {
   position: relative;
 }
-.select-box-options {
+.select-box-options, .type-ahead-results {
   @include dropdownBox;
-  min-width: 0; //always match selectbox width
+  min-width: 0; //always match input width
   li {
     @include dropdownBoxItem;
   }

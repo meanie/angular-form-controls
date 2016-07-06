@@ -2,71 +2,75 @@
 /**
  * Module definition and dependencies
  */
-angular.module('SelectBox.Component', [])
+angular.module('TypeAhead.Component', [])
 
 /**
- * Selectbox component
+ * Type ahead component
  */
-.component('selectBox', {
+.component('typeAhead', {
   template:
-    `<div class="select-box {{$ctrl.classes}}">
-      <div class="form-control-wrapper clickable" ng-click="$ctrl.toggleOptions()">
-        <span class="form-control-spinner" ng-class="{'show-spinner': $ctrl.hasSpinner}">
-          <span class="caret"
-            ng-click="$ctrl.toggleOptions(); $event.stopPropagation();"
-            ng-class="{disabled: $ctrl.isDisabled}"
-            ng-if="!$ctrl.hasSpinner"
-          ></span>
-          <input readonly class="form-control" type="text"
-            ng-value="$ctrl.getSelectedLabel()"
-            ng-keydown="$ctrl.keydown($event)"
-            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">
-          <spinner ng-if="$ctrl.hasSpinner"></spinner>
-        </span>
-      </div>
-      <ul class="select-box-options" ng-show="$ctrl.isShowingOptions">
+    `<div class="type-ahead">
+      <span class="form-control-spinner"
+        ng-class="{'show-spinner': $ctrl.isSearching}">
+        <input class="form-control" type="text"
+          placeholder="{{$ctrl.placeholder}}"
+          ng-keydown="$ctrl.keydown($event)"
+          ng-keyup="$ctrl.keyup($event)"
+          ng-disabled="$ctrl.isDisabled || $ctrl.isSearching"
+          ng-model="$ctrl.searchQuery">
+        <spinner></spinner>
+      </span>
+      <ul class="type-ahead-results" ng-show="$ctrl.isShowingResults">
         <li
-          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"
-          ng-class="{selected: $ctrl.isSelection(-1)}"
-          ng-mouseover="$ctrl.setSelection(-1)"
-          ng-click="$ctrl.confirmSelection(-1)"
-        >{{$ctrl.nullLabel}}</li>
-        <li
-          ng-transclude
-          ng-repeat="option in $ctrl.options"
+          ng-repeat="item in $ctrl.results"
           ng-class="{selected: $ctrl.isSelection($index)}"
           ng-mouseover="$ctrl.setSelection($index)"
           ng-click="$ctrl.confirmSelection($index)"
-        >{{$ctrl.getLabel(option)}}</li>
+          ng-transclude>
+          <span ng-bind-html="$ctrl.getLabel(item) |
+            markmatches:$ctrl.searchQuery:'strong'"></span>
+        </li>
       </ul>
     </div>`,
   transclude: true,
   require: {
-    ngModel: 'ngModel'
+    ngModel: 'ngModel',
   },
   bindings: {
     model: '<ngModel',
     options: '<',
+    placeholder: '@',
+    onSearch: '&',
     onChange: '&',
-    isNullable: '<',
-    nullValue: '<',
-    nullLabel: '<',
     isDisabled: '<ngDisabled',
     isRequired: '<ngRequired',
-    hasSpinner: '<hasSpinner'
+    labelBy: '@',
+    trackBy: '@',
+    asObject: '@',
+    minLength: '@',
   },
+
 
   /**
    * Component controller
    */
-  controller($element, $attrs, $log, $formControls, $scope, $document) {
+  controller(
+    $element, $scope, $formControls, $attrs, $log, $q, $timeout, $document
+  ) {
 
     //Helper vars
+    let $input, $container, $options;
     let $ctrl = this;
-    let selectionIndex, $input, $container, $options;
+    let selectionIndex = -1;
+    let debounce = 100;
     let labelBy = $attrs.labelBy || null;
     let trackBy = $attrs.trackBy || null;
     let asObject = ($attrs.asObject === 'true');
+
+    //Keep track of searches, prevent older searches overwriting newer ones
+    let currentSearch = 0;
+    let lastProcessedSearch = 0;
+    let pendingSearch = null;
 
     //Keycodes
     const KeyCodes = {
@@ -74,7 +78,7 @@ angular.module('SelectBox.Component', [])
       ESC: 27,
       SPACE: 32,
       UP: 38,
-      DOWN: 40
+      DOWN: 40,
     };
 
     /**
@@ -89,8 +93,8 @@ angular.module('SelectBox.Component', [])
      * Click handler for document
      */
     function documentClickHandler(event) {
-      if (!$input[0].contains(event.target) && $ctrl.isShowingOptions) {
-        $scope.$apply($ctrl.hideOptions.bind($ctrl));
+      if (!$input[0].contains(event.target) && $ctrl.isShowingResults) {
+        $scope.$apply($ctrl.hideResults.bind($ctrl));
       }
     }
 
@@ -170,33 +174,23 @@ angular.module('SelectBox.Component', [])
     /**
      * Helper to get the tracking value of an option
      */
-    function getTrackingValue(option, index) {
-
-      //Null value?
-      if (option === null) {
-        return $ctrl.nullValue;
-      }
-
-      //Tracking by index?
-      if (trackBy === '$index') {
-        return index;
-      }
+    function getTrackingValue(option) {
 
       //Non object? Track by its value
-      if (!angular.isObject(option)) {
+      if (option === null || !angular.isObject(option)) {
         return option;
       }
 
       //Must have tracking property
       if (!trackBy) {
-        $log.warn('Missing track-by property for select box');
-        return $ctrl.nullValue;
+        $log.warn('Missing track-by property for type ahead');
+        return null;
       }
 
       //Validate property
       if (typeof option[trackBy] === 'undefined') {
-        $log.warn('Unknown property `' + trackBy + '` for select box tracking');
-        return $ctrl.nullValue;
+        $log.warn('Unknown property `' + trackBy + '` for type ahead tracking');
+        return null;
       }
 
       //Return the property
@@ -206,12 +200,7 @@ angular.module('SelectBox.Component', [])
     /**
      * Get the model value
      */
-    function getModelValue(option, index) {
-
-      //If nullable and null option given, return null value
-      if ($ctrl.isNullable && option === null) {
-        return $ctrl.nullValue;
-      }
+    function getModelValue(option) {
 
       //If returning as object, return the selected option
       if (asObject) {
@@ -219,7 +208,7 @@ angular.module('SelectBox.Component', [])
       }
 
       //Otherwise, return the tracking value of the given option
-      return getTrackingValue(option, index);
+      return getTrackingValue(option);
     }
 
     /**
@@ -229,7 +218,7 @@ angular.module('SelectBox.Component', [])
 
       //Null value?
       if (option === null || typeof option === 'undefined') {
-        return $ctrl.nullLabel;
+        return '';
       }
 
       //Non object? Use its value
@@ -239,13 +228,13 @@ angular.module('SelectBox.Component', [])
 
       //Must have label property
       if (!labelBy) {
-        $log.warn('Missing label-by property for select box');
+        $log.warn('Missing label-by property for type ahead');
         return '';
       }
 
       //Validate property
       if (typeof option[labelBy] === 'undefined') {
-        $log.warn('Unknown property `' + labelBy + '` for select box label');
+        $log.warn('Unknown property `' + labelBy + '` for type ahead label');
         return '';
       }
 
@@ -254,69 +243,48 @@ angular.module('SelectBox.Component', [])
     }
 
     /**
-     * Find the selected option based on the model value
+     * Do a simple search on object property
      */
-    function findOption(model, options) {
-
-      //Nothing selected or null value selected?
-      if (typeof model === 'undefined' || model === $ctrl.nullValue) {
-        return null;
+    function searchOptions(value) {
+      if (!value) {
+        return $q.resolve([]);
       }
-
-      //Tracking by index?
-      if (trackBy === '$index') {
-        if (typeof options[model] !== 'undefined') {
-          return options[model];
-        }
-        return null;
-      }
-
-      //Get the model value
-      //If the model is an object, get its tracking value
-      let modelValue = model;
-      if (asObject && angular.isObject(model)) {
-        modelValue = getTrackingValue(model);
-      }
-
-      //Find matching option
-      return options
-        .find((option, index) => {
-          let optionValue = getTrackingValue(option, index);
-          return (modelValue === optionValue);
+      let regex = new RegExp('(?:^|\\b)(' + value + ')', 'i');
+      let items = $ctrl.options
+        .filter(option => {
+          let label = getLabelValue(option);
+          return regex.test(label);
         });
+      return $q.resolve(items);
     }
 
     /**
-     * Initialization
+     * Init
      */
     this.$onInit = function() {
-
-      //Check configuration
-      if (asObject && trackBy === '$index') {
-        $log.warn('Cannot track select box by index if model is an object');
-        asObject = false;
-      }
-
-      //Initialize flags
-      this.isShowingOptions = false;
-
-      //Propagate classes
-      this.classes = $element[0].className;
-      $element[0].className = '';
 
       //Find some elements
       $input = $element.find('input');
       $container = $input.parent().next();
       $options = $container.find('li');
 
-      //Apply document click handler
+      //Propagate focus
+      $element.attr('tabindex', -1);
+      $element.on('focus', () => {
+        $input[0].focus();
+      });
+
+      //Global click event handler
       $document.on('click', documentClickHandler);
+
+      //Initialize results and flags
+      this.results = [];
+      this.searchQuery = getLabelValue(this.model);
+      this.isSearching = false;
+      this.isShowingResults = false;
 
       //Empty check override in order for ng-required to work properly
       this.ngModel.$isEmpty = function() {
-        if ($ctrl.isNullable) {
-          return ($ctrl.model === $ctrl.nullValue);
-        }
         return ($ctrl.model === null || typeof $ctrl.model === 'undefined');
       };
     };
@@ -329,38 +297,9 @@ angular.module('SelectBox.Component', [])
     };
 
     /**
-     * On change
+     * Change handler
      */
     this.$onChanges = function(changes) {
-
-      //Must have array as options
-      if (!angular.isArray(this.options)) {
-        this.options = [];
-      }
-
-      //Set default null value/label if not set
-      if (typeof this.nullValue === 'undefined') {
-        this.nullValue = null;
-      }
-      if (typeof this.nullLabel === 'undefined') {
-        this.nullLabel = '...';
-      }
-
-      //Set model to null value if not defined or null
-      if (this.isNullable) {
-        if (this.model === null || typeof this.model === 'undefined') {
-          this.model = this.nullValue;
-        }
-      }
-
-      //If disabled, hide options
-      if (this.isDisabled) {
-        this.isShowingOptions = false;
-      }
-
-      //Determine selection index
-      let option = findOption(this.model, this.options);
-      selectionIndex = this.options.indexOf(option);
 
       //Validate and mark as dirty if needed
       if (changes.model) {
@@ -372,12 +311,19 @@ angular.module('SelectBox.Component', [])
     };
 
     /**
-     * Keydown handler for input element
+     * Get label value of an option
+     */
+    this.getLabel = function(option) {
+      return getLabelValue(option);
+    };
+
+    /**
+     * Key down handler
      */
     this.keydown = function(event) {
 
       //Arrows up/down, move selection
-      if (this.isShowingOptions && isControlInput(event)) {
+      if (this.isShowingResults && isControlInput(event)) {
         event.preventDefault();
         if (event.keyCode === KeyCodes.UP) {
           moveSelectionUp();
@@ -386,7 +332,7 @@ angular.module('SelectBox.Component', [])
           moveSelectionDown();
         }
         else if (event.keyCode === KeyCodes.ESC) {
-          this.hideOptions();
+          this.hideResults();
         }
         else if (event.keyCode === KeyCodes.ENTER) {
           this.confirmSelection();
@@ -396,64 +342,129 @@ angular.module('SelectBox.Component', [])
       //Show options
       else if (event.keyCode === KeyCodes.ENTER) {
         event.preventDefault();
-        this.showOptions();
+        this.showResults();
       }
     };
 
     /**
-     * Get label value of selected option
+     * Key up handler
      */
-    this.getSelectedLabel = function() {
-      let option = findOption(this.model, this.options);
-      return getLabelValue(option);
-    };
+    this.keyup = function(event) {
 
-    /**
-     * Get label value of an option
-     */
-    this.getLabel = function(option) {
-      return getLabelValue(option);
-    };
+      //If control input, skip further handling
+      if (isControlInput(event)) {
+        return;
+      }
 
-    /**
-     * Show options
-     */
-    this.showOptions = function() {
-      if (!this.isDisabled && !this.hasSpinner) {
-        this.isShowingOptions = true;
+      //Get search query
+      let value = (this.searchQuery || '').trim();
+
+      //Should we search?
+      if (!this.minLength || value.length >= this.minLength) {
+        this.search(value);
+      }
+      else if (this.hasResults()) {
+        this.clearResults();
+        this.clearSelection();
       }
     };
 
+    /**************************************************************************
+     * Search
+     ***/
+
     /**
-     * Hide options
+     * Search wrapper
      */
-    this.hideOptions = function() {
-      this.isShowingOptions = false;
+    this.search = function(value) {
+
+      //Create new debounced search
+      pendingSearch = $timeout(() => {
+        pendingSearch = null;
+        return this.doSearch(value);
+      }, debounce);
+
+      //Return the promise
+      return pendingSearch;
     };
 
     /**
-     * Toggle options
+     * Actual search handler
      */
-    this.toggleOptions = function() {
-      if (this.isShowingOptions) {
-        this.hideOptions();
+    this.doSearch = function(value) {
+
+      //Determine search handler
+      let search;
+      if (this.options && angular.isArray(this.options)) {
+        search = searchOptions(value);
+      }
+      else if ($attrs.onSearch) {
+        search = this.onSearch({value});
       }
       else {
-        this.showOptions();
+        $log.warn('No search handler or options specified');
+        return $q.reject();
       }
+
+      //Toggle flag
+      this.isSearching = true;
+
+      //Return search promise
+      return search
+
+        //Check if we've gotten an old search back
+        .then(results => {
+          if (++currentSearch > lastProcessedSearch) {
+            return results;
+          }
+          return $q.reject('old search');
+        })
+
+        //Process the results
+        .then(results => {
+          this.clearSelection();
+          this.results = results;
+          if (results && results.length > 0) {
+            this.isShowingResults = true;
+          }
+        })
+
+        //Done searching
+        .finally(() => this.isSearching = false);
+    };
+
+    /**************************************************************************
+     * Results navigation & handling
+     ***/
+
+    /**
+     * Check if we have results
+     */
+    this.hasResults = function() {
+      return (this.results && this.results.length > 0);
     };
 
     /**
-     * Has options check
+     * Clear results
      */
-    this.hasOptions = function() {
-      return (this.options.length > 0);
+    this.clearResults = function() {
+      this.results = [];
+      this.isShowingResults = false;
+    };
+
+    /**
+     * Show results
+     */
+    this.showResults = function() {
+      if (this.hasResults()) {
+        this.isShowingResults = true;
+      }
     };
 
     /**
      * Select an option
      */
-    this.select = function(option, index) {
+    this.select = function(option) {
 
       //Ignore when disabled
       if (this.isDisabled) {
@@ -461,11 +472,24 @@ angular.module('SelectBox.Component', [])
       }
 
       //Hide options
-      this.hideOptions();
+      this.hideResults();
 
-      //Get the new model value and call on change handler
-      let value = getModelValue(option, index);
+      //Get the new model and label values
+      let value = getModelValue(option);
+      let label = getLabelValue(option);
+
+      //Set as search query
+      this.searchQuery = label;
+
+      //Call on change handler
       this.onChange({value, option});
+    };
+
+    /**
+     * Hide results
+     */
+    this.hideResults = function() {
+      this.isShowingResults = false;
     };
 
     /**
@@ -483,6 +507,13 @@ angular.module('SelectBox.Component', [])
     };
 
     /**
+     * Clear selection
+     */
+    this.clearSelection = function() {
+      selectionIndex = undefined;
+    };
+
+    /**
      * Confirm selection
      */
     this.confirmSelection = function(index) {
@@ -492,32 +523,15 @@ angular.module('SelectBox.Component', [])
         index = selectionIndex;
       }
 
-      //Initialize option
-      let option;
-
-      //Nullable and -1 index given?
-      if (this.isNullable && index === -1) {
-        option = null;
+      //Validate index
+      if (
+        this.results.length === 0 ||
+        typeof this.results[index] === 'undefined') {
+        return;
       }
 
-      //Otherwise, take from given options
-      else {
-
-        //Validate index
-        if (
-          !this.hasOptions() ||
-          typeof index === 'undefined' ||
-          typeof this.options[index] === 'undefined'
-        ) {
-          return;
-        }
-
-        //Get option
-        option = this.options[index];
-      }
-
-      //Select option now
-      this.select(option, index);
+      //Select result
+      this.select(this.results[index]);
     };
-  }
+  },
 });
