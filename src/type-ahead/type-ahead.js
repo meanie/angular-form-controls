@@ -485,6 +485,7 @@ angular.module('TypeAhead.Component', [])
 
       //Set as search query
       this.searchQuery = label;
+      this.onQuery({value: label});
 
       //Call on change handler
       this.onChange({value, option});
