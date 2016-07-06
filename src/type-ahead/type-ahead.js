@@ -1,4 +1,3 @@
-
 /**
  * Module definition and dependencies
  */
@@ -49,6 +48,7 @@ angular.module('TypeAhead.Component', [])
     trackBy: '@',
     asObject: '@',
     minLength: '@',
+    allowNew: '@',
   },
 
 
@@ -67,6 +67,7 @@ angular.module('TypeAhead.Component', [])
     let labelBy = $attrs.labelBy || null;
     let trackBy = $attrs.trackBy || null;
     let asObject = ($attrs.asObject === 'true');
+    let allowNew = ($attrs.allowNew === 'true');
 
     //Keep track of searches, prevent older searches overwriting newer ones
     let currentSearch = 0;
@@ -285,7 +286,13 @@ angular.module('TypeAhead.Component', [])
 
       //Empty check override in order for ng-required to work properly
       this.ngModel.$isEmpty = function() {
-        return ($ctrl.model === null || typeof $ctrl.model === 'undefined');
+        if ($ctrl.model === null || typeof $ctrl.model === 'undefined') {
+          if (allowNew && $ctrl.searchQuery) {
+            return false;
+          }
+          return true;
+        }
+        return false;
       };
     };
 
