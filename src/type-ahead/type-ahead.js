@@ -280,7 +280,6 @@ angular.module('TypeAhead.Component', [])
 
       //Initialize results and flags
       this.results = [];
-      this.searchQuery = '';
       this.isSearching = false;
       this.isShowingResults = false;
 
