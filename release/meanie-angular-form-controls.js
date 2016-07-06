@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.1 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.2 - 7-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1544,6 +1544,7 @@
 
         //Set as search query
         this.searchQuery = label;
+        this.onQuery({ value: label });
 
         //Call on change handler
         this.onChange({ value: value, option: option });
