@@ -42,6 +42,7 @@ angular.module('TypeAhead.Component', [])
     placeholder: '@',
     onSearch: '&',
     onChange: '&',
+    onQuery: '&',
     isDisabled: '<ngDisabled',
     isRequired: '<ngRequired',
     labelBy: '@',
@@ -279,7 +280,7 @@ angular.module('TypeAhead.Component', [])
 
       //Initialize results and flags
       this.results = [];
-      this.searchQuery = getLabelValue(this.model);
+      this.searchQuery = '';
       this.isSearching = false;
       this.isShowingResults = false;
 
@@ -303,6 +304,7 @@ angular.module('TypeAhead.Component', [])
 
       //Validate and mark as dirty if needed
       if (changes.model) {
+        this.searchQuery = getLabelValue(this.model);
         this.ngModel.$validate();
         if ($formControls.hasChanged(changes.model)) {
           this.ngModel.$setDirty();
@@ -358,6 +360,9 @@ angular.module('TypeAhead.Component', [])
 
       //Get search query
       let value = (this.searchQuery || '').trim();
+
+      //Pass via event
+      this.onQuery({value});
 
       //Should we search?
       if (!this.minLength || value.length >= this.minLength) {
