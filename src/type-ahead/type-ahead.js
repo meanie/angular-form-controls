@@ -79,6 +79,7 @@ angular.module('TypeAhead.Component', [])
       ENTER: 13,
       ESC: 27,
       SPACE: 32,
+      TAB: 9,
       UP: 38,
       DOWN: 40,
     };
@@ -87,7 +88,9 @@ angular.module('TypeAhead.Component', [])
      * Check if input was control
      */
     function isControlInput(event) {
-      let keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC];
+      let keys = [
+        KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB,
+      ];
       return (keys.indexOf(event.keyCode) > -1);
     }
 
@@ -347,6 +350,9 @@ angular.module('TypeAhead.Component', [])
           moveSelectionDown();
         }
         else if (event.keyCode === KeyCodes.ESC) {
+          this.hideResults();
+        }
+        else if (event.keyCode === KeyCodes.TAB) {
           this.hideResults();
         }
         else if (event.keyCode === KeyCodes.ENTER) {
