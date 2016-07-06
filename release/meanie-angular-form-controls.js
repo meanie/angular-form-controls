@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.4 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.5 - 7-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1364,7 +1364,14 @@
 
         //Validate and mark as dirty if needed
         if (changes.model) {
-          this.searchQuery = getLabelValue(this.model);
+
+          //Only update search query when we have a model
+          //This is to prevent the input from being cleared when we go and edit
+          if (this.model) {
+            this.searchQuery = getLabelValue(this.model);
+          }
+
+          //Validate model
           this.ngModel.$validate();
           if ($formControls.hasChanged(changes.model)) {
             this.ngModel.$setDirty();
