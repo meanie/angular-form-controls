@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.5 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.6 - 7-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1088,7 +1088,6 @@
 
 (function (window, angular, undefined) {
   'use strict';
-
   /**
    * Module definition and dependencies
    */
@@ -1116,7 +1115,8 @@
       labelBy: '@',
       trackBy: '@',
       asObject: '@',
-      minLength: '@'
+      minLength: '@',
+      allowNew: '@'
     },
 
     /**
@@ -1134,6 +1134,7 @@
       var labelBy = $attrs.labelBy || null;
       var trackBy = $attrs.trackBy || null;
       var asObject = $attrs.asObject === 'true';
+      var allowNew = $attrs.allowNew === 'true';
 
       //Keep track of searches, prevent older searches overwriting newer ones
       var currentSearch = 0;
@@ -1346,7 +1347,13 @@
 
         //Empty check override in order for ng-required to work properly
         this.ngModel.$isEmpty = function () {
-          return $ctrl.model === null || typeof $ctrl.model === 'undefined';
+          if ($ctrl.model === null || typeof $ctrl.model === 'undefined') {
+            if (allowNew && $ctrl.searchQuery) {
+              return false;
+            }
+            return true;
+          }
+          return false;
         };
       };
 
