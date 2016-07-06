@@ -360,8 +360,9 @@ angular.module('TypeAhead.Component', [])
       //Get search query
       let value = (this.searchQuery || '').trim();
 
-      //Pass via event
+      //Call event handlers
       this.onQuery({value});
+      this.onChange({value: null, option: null});
 
       //Should we search?
       if (!this.minLength || value.length >= this.minLength) {
@@ -484,9 +485,9 @@ angular.module('TypeAhead.Component', [])
 
       //Set as search query
       this.searchQuery = label;
-      this.onQuery({value: label});
 
-      //Call on change handler
+      //Call event handlers
+      this.onQuery({value: label});
       this.onChange({value, option});
     };
 
