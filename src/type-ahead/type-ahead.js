@@ -303,7 +303,14 @@ angular.module('TypeAhead.Component', [])
 
       //Validate and mark as dirty if needed
       if (changes.model) {
-        this.searchQuery = getLabelValue(this.model);
+
+        //Only update search query when we have a model
+        //This is to prevent the input from being cleared when we go and edit
+        if (this.model) {
+          this.searchQuery = getLabelValue(this.model);
+        }
+
+        //Validate model
         this.ngModel.$validate();
         if ($formControls.hasChanged(changes.model)) {
           this.ngModel.$setDirty();
