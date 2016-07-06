@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.7 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.8 - 7-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1401,16 +1401,20 @@
 
         //Arrows up/down, move selection
         if (this.isShowingResults && isControlInput(event)) {
-          event.preventDefault();
           if (event.keyCode === KeyCodes.UP) {
+            event.preventDefault();
             moveSelectionUp();
           } else if (event.keyCode === KeyCodes.DOWN) {
+            event.preventDefault();
             moveSelectionDown();
           } else if (event.keyCode === KeyCodes.ESC) {
+            event.preventDefault();
             this.hideResults();
           } else if (event.keyCode === KeyCodes.TAB) {
+            //Don't prevent default
             this.hideResults();
           } else if (event.keyCode === KeyCodes.ENTER) {
+            event.preventDefault();
             this.confirmSelection();
           }
         }
