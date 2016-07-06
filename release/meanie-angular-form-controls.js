@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.6 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.7 - 7-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1146,6 +1146,7 @@
         ENTER: 13,
         ESC: 27,
         SPACE: 32,
+        TAB: 9,
         UP: 38,
         DOWN: 40
       };
@@ -1154,7 +1155,7 @@
        * Check if input was control
        */
       function isControlInput(event) {
-        var keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC];
+        var keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB];
         return keys.indexOf(event.keyCode) > -1;
       }
 
@@ -1406,6 +1407,8 @@
           } else if (event.keyCode === KeyCodes.DOWN) {
             moveSelectionDown();
           } else if (event.keyCode === KeyCodes.ESC) {
+            this.hideResults();
+          } else if (event.keyCode === KeyCodes.TAB) {
             this.hideResults();
           } else if (event.keyCode === KeyCodes.ENTER) {
             this.confirmSelection();
