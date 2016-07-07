@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.8 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.9 - 7-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1442,6 +1442,10 @@
         //Call event handlers
         this.onQuery({ value: value });
         this.onChange({ value: null, option: null });
+
+        //Validate and mark as dirty
+        this.ngModel.$validate();
+        this.ngModel.$setDirty();
 
         //Should we search?
         if (!this.minLength || value.length >= this.minLength) {
