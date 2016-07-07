@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.9 - 7-6-2016
+ * meanie-angular-form-controls - v1.1.10 - 8-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
@@ -1098,7 +1098,7 @@
    * Type ahead component
    */
   .component('typeAhead', {
-    template: '<div class="type-ahead">\n      <span class="form-control-spinner"\n        ng-class="{\'show-spinner\': $ctrl.isSearching}">\n        <input class="form-control" type="text"\n          placeholder="{{$ctrl.placeholder}}"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-keyup="$ctrl.keyup($event)"\n          ng-disabled="$ctrl.isDisabled || $ctrl.isSearching"\n          ng-model="$ctrl.searchQuery">\n        <spinner></spinner>\n      </span>\n      <ul class="type-ahead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
+    template: '<div class="type-ahead">\n      <span class="form-control-spinner"\n        ng-class="{\'show-spinner\': $ctrl.isSearching}">\n        <input class="form-control" type="text"\n          placeholder="{{$ctrl.placeholder}}"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-keyup="$ctrl.keyup($event)"\n          ng-disabled="$ctrl.isDisabled"\n          ng-model="$ctrl.searchQuery">\n        <spinner></spinner>\n      </span>\n      <ul class="type-ahead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
@@ -1308,6 +1308,38 @@
       }
 
       /**
+       * Find the selected option based on the model value
+       */
+      function findOption(model, options) {
+
+        //Nothing selected or null value selected?
+        if (typeof model === 'undefined' || model === $ctrl.nullValue) {
+          return null;
+        }
+
+        //Tracking by index?
+        if (trackBy === '$index') {
+          if (typeof options[model] !== 'undefined') {
+            return options[model];
+          }
+          return null;
+        }
+
+        //Get the model value
+        //If the model is an object, get its tracking value
+        var modelValue = model;
+        if (asObject && angular.isObject(model)) {
+          modelValue = getTrackingValue(model);
+        }
+
+        //Find matching option
+        return options.find(function (option, index) {
+          var optionValue = getTrackingValue(option, index);
+          return modelValue === optionValue;
+        });
+      }
+
+      /**
        * Do a simple search on object property
        */
       function searchOptions(value) {
@@ -1376,7 +1408,15 @@
           //Only update search query when we have a model
           //This is to prevent the input from being cleared when we go and edit
           if (this.model) {
-            this.searchQuery = getLabelValue(this.model);
+            var option = void 0;
+            if (angular.isArray(this.options)) {
+              option = findOption(this.model, this.options);
+            } else if (angular.isObject(this.model)) {
+              option = this.model;
+            }
+            if (option) {
+              this.searchQuery = getLabelValue(option);
+            }
           }
 
           //Validate model
