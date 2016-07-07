@@ -388,6 +388,10 @@ angular.module('TypeAhead.Component', [])
       this.onQuery({value});
       this.onChange({value: null, option: null});
 
+      //Validate and mark as dirty
+      this.ngModel.$validate();
+      this.ngModel.$setDirty();
+
       //Should we search?
       if (!this.minLength || value.length >= this.minLength) {
         this.search(value);
