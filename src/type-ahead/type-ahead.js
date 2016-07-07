@@ -15,7 +15,7 @@ angular.module('TypeAhead.Component', [])
           placeholder="{{$ctrl.placeholder}}"
           ng-keydown="$ctrl.keydown($event)"
           ng-keyup="$ctrl.keyup($event)"
-          ng-disabled="$ctrl.isDisabled || $ctrl.isSearching"
+          ng-disabled="$ctrl.isDisabled"
           ng-model="$ctrl.searchQuery">
         <spinner></spinner>
       </span>
@@ -50,7 +50,6 @@ angular.module('TypeAhead.Component', [])
     minLength: '@',
     allowNew: '@',
   },
-
 
   /**
    * Component controller
@@ -248,6 +247,39 @@ angular.module('TypeAhead.Component', [])
     }
 
     /**
+     * Find the selected option based on the model value
+     */
+    function findOption(model, options) {
+
+      //Nothing selected or null value selected?
+      if (typeof model === 'undefined' || model === $ctrl.nullValue) {
+        return null;
+      }
+
+      //Tracking by index?
+      if (trackBy === '$index') {
+        if (typeof options[model] !== 'undefined') {
+          return options[model];
+        }
+        return null;
+      }
+
+      //Get the model value
+      //If the model is an object, get its tracking value
+      let modelValue = model;
+      if (asObject && angular.isObject(model)) {
+        modelValue = getTrackingValue(model);
+      }
+
+      //Find matching option
+      return options
+        .find((option, index) => {
+          let optionValue = getTrackingValue(option, index);
+          return (modelValue === optionValue);
+        });
+    }
+
+    /**
      * Do a simple search on object property
      */
     function searchOptions(value) {
@@ -317,7 +349,16 @@ angular.module('TypeAhead.Component', [])
         //Only update search query when we have a model
         //This is to prevent the input from being cleared when we go and edit
         if (this.model) {
-          this.searchQuery = getLabelValue(this.model);
+          let option;
+          if (angular.isArray(this.options)) {
+            option = findOption(this.model, this.options);
+          }
+          else if (angular.isObject(this.model)) {
+            option = this.model;
+          }
+          if (option) {
+            this.searchQuery = getLabelValue(option);
+          }
         }
 
         //Validate model
