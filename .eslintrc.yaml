@@ -18,7 +18,7 @@ rules:
     - error
     - unix
   max-len:
-    - error
+    - warn
     - code: 80
       tabWidth: 2
       ignoreComments: true
@@ -122,6 +122,9 @@ rules:
   no-implicit-coercion:
     - error
     - boolean: false
+  no-multiple-empty-lines:
+    - error
+    - max: 1
   eol-last: error
   dot-notation: error
   space-infix-ops: error

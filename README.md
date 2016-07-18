@@ -12,7 +12,7 @@ A set of form control components for Angular 1 (select box, check boxes, radio b
 
 ## Installation
 
-You can install this package using `npm`.
+You can install this package using `npm`:
 
 ```shell
 npm install meanie-angular-form-controls --save
