@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls - v1.1.10 - 18-6-2016
+ * meanie-angular-form-controls - v1.1.11 - 18-6-2016
  * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2016 Adam Buczynski <me@adambuczynski.com>
