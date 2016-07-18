@@ -47,7 +47,7 @@ function packageFileName(filename, ext) {
 function angularWrapper() {
   return {
     header: '(function(window, angular, undefined) {\'use strict\';\n',
-    footer: '\n})(window, window.angular);\n'
+    footer: '\n})(window, window.angular);\n',
   };
 }
 
@@ -62,14 +62,11 @@ function bannerWrapper() {
   //Get date and author
   let today = new Date();
   let author = pkg.author.name + ' <' + pkg.author.email + '>';
-  let date = today.getDate() + '-' +
-             today.getMonth() + '-' +
-             today.getFullYear();
 
   //Format banner
   let banner =
     '/**\n' +
-    ' * ' + pkg.name + ' - v' + pkg.version + ' - ' + date + '\n' +
+    ' * ' + pkg.name +
     ' * ' + pkg.homepage + '\n' +
     ' *\n' +
     ' * Copyright (c) ' + today.getFullYear() + ' ' + author + '\n' +
@@ -79,7 +76,7 @@ function bannerWrapper() {
   //Return wrapper
   return {
     header: banner,
-    footer: ''
+    footer: '',
   };
 }
 
@@ -92,18 +89,18 @@ function bannerWrapper() {
  */
 function release() {
   let jsFilter = filter(['*.js'], {
-    restore: true
+    restore: true,
   });
   return gulp.src([
-    'src/**/*.js'
+    'src/**/*.js',
   ])
     .pipe(wrapper(angularWrapper()))
     .pipe(sourcemaps.init())
       .pipe(babel({
-        compact: false
+        compact: false,
       }))
       .pipe(ngAnnotate({
-        single_quotes: true
+        single_quotes: true,
       }))
       .pipe(concat(packageFileName('.js')))
       .pipe(wrapper(bannerWrapper()))
