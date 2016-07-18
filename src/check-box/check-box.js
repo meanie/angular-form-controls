@@ -15,7 +15,7 @@ angular.module('CheckBox.Component', [])
       ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"
     ></label>`,
   require: {
-    ngModel: 'ngModel'
+    ngModel: 'ngModel',
   },
   transclude: true,
   bindings: {
@@ -23,7 +23,7 @@ angular.module('CheckBox.Component', [])
     onChange: '&',
     isInverse: '<isInverse',
     isDisabled: '<ngDisabled',
-    isRequired: '<ngRequired'
+    isRequired: '<ngRequired',
   },
 
   /**
@@ -86,5 +86,5 @@ angular.module('CheckBox.Component', [])
     this.isChecked = function() {
       return (this.isInverse ? !this.model : !!this.model);
     };
-  }
+  },
 });

@@ -17,14 +17,14 @@ angular.module('CheckBoxes.Component', [])
       >{{$ctrl.getLabel(option)}}</label>
     </div>`,
   require: {
-    ngModel: 'ngModel'
+    ngModel: 'ngModel',
   },
   bindings: {
     model: '<ngModel',
     options: '<',
     onChange: '&',
     isDisabled: '<ngDisabled',
-    isRequired: '<ngRequired'
+    isRequired: '<ngRequired',
   },
 
   /**
@@ -139,7 +139,7 @@ angular.module('CheckBoxes.Component', [])
 
         //Needed here to prevent $validate from setting the model to undefined
         $ctrl.ngModel.$$setOptions({
-          allowInvalid: true
+          allowInvalid: true,
         });
 
         //Return check now
@@ -212,5 +212,5 @@ angular.module('CheckBoxes.Component', [])
       //Call on change handler
       this.onChange({value});
     };
-  }
+  },
 });

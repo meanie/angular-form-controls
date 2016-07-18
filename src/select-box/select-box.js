@@ -42,7 +42,7 @@ angular.module('SelectBox.Component', [])
     </div>`,
   transclude: true,
   require: {
-    ngModel: 'ngModel'
+    ngModel: 'ngModel',
   },
   bindings: {
     model: '<ngModel',
@@ -53,7 +53,7 @@ angular.module('SelectBox.Component', [])
     nullLabel: '<',
     isDisabled: '<ngDisabled',
     isRequired: '<ngRequired',
-    hasSpinner: '<hasSpinner'
+    hasSpinner: '<hasSpinner',
   },
 
   /**
@@ -74,7 +74,7 @@ angular.module('SelectBox.Component', [])
       ESC: 27,
       SPACE: 32,
       UP: 38,
-      DOWN: 40
+      DOWN: 40,
     };
 
     /**
@@ -519,5 +519,5 @@ angular.module('SelectBox.Component', [])
       //Select option now
       this.select(option, index);
     };
-  }
+  },
 });

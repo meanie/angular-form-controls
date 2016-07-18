@@ -7,7 +7,7 @@ angular.module('FormControls.Component', [
   'CheckBoxes.Component',
   'RadioButtons.Component',
   'SelectBox.Component',
-  'TypeAhead.Component'
+  'TypeAhead.Component',
 ])
 
 /**
@@ -31,6 +31,6 @@ angular.module('FormControls.Component', [
 
       //Check if equals
       return !angular.equals(previousValue, currentValue);
-    }
+    },
   };
 });

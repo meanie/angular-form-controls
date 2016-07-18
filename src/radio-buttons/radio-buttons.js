@@ -22,7 +22,7 @@ angular.module('RadioButtons.Component', [])
       >{{$ctrl.getLabel(option)}}</label>
     </div>`,
   require: {
-    ngModel: 'ngModel'
+    ngModel: 'ngModel',
   },
   bindings: {
     model: '<ngModel',
@@ -32,7 +32,7 @@ angular.module('RadioButtons.Component', [])
     nullValue: '<',
     nullLabel: '<',
     isDisabled: '<ngDisabled',
-    isRequired: '<ngRequired'
+    isRequired: '<ngRequired',
   },
 
   /**
@@ -249,5 +249,5 @@ angular.module('RadioButtons.Component', [])
       let value = getModelValue(option, index);
       this.onChange({value, option});
     };
-  }
+  },
 });
