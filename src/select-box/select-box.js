@@ -91,6 +91,8 @@ angular.module('SelectBox.Component', [])
     function documentClickHandler(event) {
       if (!$input[0].contains(event.target) && $ctrl.isShowingOptions) {
         $scope.$apply($ctrl.hideOptions.bind($ctrl));
+        event.preventDefault();
+        event.stopPropagation();
       }
     }
 

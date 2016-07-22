@@ -99,6 +99,8 @@ angular.module('TypeAhead.Component', [])
     function documentClickHandler(event) {
       if (!$input[0].contains(event.target) && $ctrl.isShowingResults) {
         $scope.$apply($ctrl.hideResults.bind($ctrl));
+        event.preventDefault();
+        event.stopPropagation();
       }
     }
 
