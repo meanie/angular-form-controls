@@ -871,7 +871,8 @@
         $options = $container.find('li');
 
         //Apply document click handler
-        $document.on('click', documentClickHandler);
+        //NOTE: applied on body, so that it can prevent global $document handlers
+        $document.find('body').on('click', documentClickHandler);
 
         //Empty check override in order for ng-required to work properly
         this.ngModel.$isEmpty = function () {
@@ -886,7 +887,7 @@
        * Destroy
        */
       this.$onDestroy = function () {
-        $document.off('click', documentClickHandler);
+        $document.find('body').off('click', documentClickHandler);
       };
 
       /**
@@ -1361,8 +1362,9 @@
           $input[0].focus();
         });
 
-        //Global click event handler
-        $document.on('click', documentClickHandler);
+        //Apply document click handler
+        //NOTE: applied on body, so that it can prevent global $document handlers
+        $document.find('body').on('click', documentClickHandler);
 
         //Initialize results and flags
         this.results = [];
@@ -1385,7 +1387,7 @@
        * Destroy
        */
       this.$onDestroy = function () {
-        $document.off('click', documentClickHandler);
+        $document.find('body').off('click', documentClickHandler);
       };
 
       /**
