@@ -656,6 +656,8 @@
       function documentClickHandler(event) {
         if (!$input[0].contains(event.target) && $ctrl.isShowingOptions) {
           $scope.$apply($ctrl.hideOptions.bind($ctrl));
+          event.preventDefault();
+          event.stopPropagation();
         }
       }
 
@@ -1152,6 +1154,8 @@
       function documentClickHandler(event) {
         if (!$input[0].contains(event.target) && $ctrl.isShowingResults) {
           $scope.$apply($ctrl.hideResults.bind($ctrl));
+          event.preventDefault();
+          event.stopPropagation();
         }
       }
 
