@@ -313,8 +313,9 @@ angular.module('TypeAhead.Component', [])
         $input[0].focus();
       });
 
-      //Global click event handler
-      $document.on('click', documentClickHandler);
+      //Apply document click handler
+      //NOTE: applied on body, so that it can prevent global $document handlers
+      $document.find('body').on('click', documentClickHandler);
 
       //Initialize results and flags
       this.results = [];
@@ -337,7 +338,7 @@ angular.module('TypeAhead.Component', [])
      * Destroy
      */
     this.$onDestroy = function() {
-      $document.off('click', documentClickHandler);
+      $document.find('body').off('click', documentClickHandler);
     };
 
     /**

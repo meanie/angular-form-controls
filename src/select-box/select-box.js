@@ -312,7 +312,8 @@ angular.module('SelectBox.Component', [])
       $options = $container.find('li');
 
       //Apply document click handler
-      $document.on('click', documentClickHandler);
+      //NOTE: applied on body, so that it can prevent global $document handlers
+      $document.find('body').on('click', documentClickHandler);
 
       //Empty check override in order for ng-required to work properly
       this.ngModel.$isEmpty = function() {
@@ -327,7 +328,7 @@ angular.module('SelectBox.Component', [])
      * Destroy
      */
     this.$onDestroy = function() {
-      $document.off('click', documentClickHandler);
+      $document.find('body').off('click', documentClickHandler);
     };
 
     /**
