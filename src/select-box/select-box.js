@@ -274,11 +274,7 @@ angular.module('SelectBox.Component', [])
       }
 
       //Get the model value
-      //If the model is an object, get its tracking value
-      let modelValue = model;
-      if (asObject && angular.isObject(model)) {
-        modelValue = getTrackingValue(model);
-      }
+      let modelValue = getTrackingValue(model, model);
 
       //Find matching option
       return options

@@ -151,13 +151,8 @@ angular.module('RadioButtons.Component', [])
       }
 
       //Get the model and option values
-      let modelValue = $ctrl.model;
+      let modelValue = getTrackingValue($ctrl.model, $ctrl.model);
       let optionValue = getTrackingValue(option, index);
-
-      //If the model is an object, get its tracking value
-      if (asObject && angular.isObject($ctrl.model)) {
-        modelValue = getTrackingValue($ctrl.model);
-      }
 
       //Compare the two
       return (modelValue === optionValue);

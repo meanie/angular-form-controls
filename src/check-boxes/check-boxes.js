@@ -105,17 +105,14 @@ angular.module('CheckBoxes.Component', [])
         return false;
       }
 
-      //Get the model and option values
+      //Get option value
       let optionValue = getTrackingValue(option, index);
-      let modelValues = model.map(modelValue => {
-        if (asObject && angular.isObject(modelValue)) {
-          return getTrackingValue(modelValue);
-        }
-        return modelValue;
-      });
 
       //See if present in model values
-      let find = modelValues.find(modelValue => modelValue === optionValue);
+      let find = model.find(model => {
+        let modelValue = getTrackingValue(model, model);
+        return (modelValue === optionValue);
+      });
       return (typeof find !== 'undefined');
     }
 
@@ -198,15 +195,18 @@ angular.module('CheckBoxes.Component', [])
 
       //Check if currently checked (use source model) and get the item value
       let checked = isChecked(value, option, index);
-      let item = asObject ? option : getTrackingValue(option, index);
+      let optionValue = getTrackingValue(option, index);
 
       //If checked, remove from target model, otherwise add
       if (checked) {
-        let i = value.indexOf(item);
+        let i = value.findIndex(model => {
+          let modelValue = getTrackingValue(model, model);
+          return (modelValue === optionValue);
+        });
         value.splice(i, 1);
       }
       else {
-        value.push(item);
+        value.push(asObject ? option : optionValue);
       }
 
       //Call on change handler
