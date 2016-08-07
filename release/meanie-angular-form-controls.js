@@ -233,17 +233,12 @@
           return false;
         }
 
-        //Get the model and option values
+        //Get option value
         var optionValue = getTrackingValue(option, index);
-        var modelValues = model.map(function (modelValue) {
-          if (asObject && angular.isObject(modelValue)) {
-            return getTrackingValue(modelValue);
-          }
-          return modelValue;
-        });
 
         //See if present in model values
-        var find = modelValues.find(function (modelValue) {
+        var find = model.find(function (model) {
+          var modelValue = getTrackingValue(model, model);
           return modelValue === optionValue;
         });
         return typeof find !== 'undefined';
@@ -330,14 +325,17 @@
 
         //Check if currently checked (use source model) and get the item value
         var checked = isChecked(value, option, index);
-        var item = asObject ? option : getTrackingValue(option, index);
+        var optionValue = getTrackingValue(option, index);
 
         //If checked, remove from target model, otherwise add
         if (checked) {
-          var i = value.indexOf(item);
+          var i = value.findIndex(function (model) {
+            var modelValue = getTrackingValue(model, model);
+            return modelValue === optionValue;
+          });
           value.splice(i, 1);
         } else {
-          value.push(item);
+          value.push(asObject ? option : optionValue);
         }
 
         //Call on change handler
@@ -487,13 +485,8 @@
         }
 
         //Get the model and option values
-        var modelValue = $ctrl.model;
+        var modelValue = getTrackingValue($ctrl.model, $ctrl.model);
         var optionValue = getTrackingValue(option, index);
-
-        //If the model is an object, get its tracking value
-        if (asObject && angular.isObject($ctrl.model)) {
-          modelValue = getTrackingValue($ctrl.model);
-        }
 
         //Compare the two
         return modelValue === optionValue;
@@ -834,11 +827,7 @@
         }
 
         //Get the model value
-        //If the model is an object, get its tracking value
-        var modelValue = model;
-        if (asObject && angular.isObject(model)) {
-          modelValue = getTrackingValue(model);
-        }
+        var modelValue = getTrackingValue(model, model);
 
         //Find matching option
         return options.find(function (option, index) {
@@ -1318,11 +1307,7 @@
         }
 
         //Get the model value
-        //If the model is an object, get its tracking value
-        var modelValue = model;
-        if (asObject && angular.isObject(model)) {
-          modelValue = getTrackingValue(model);
-        }
+        var modelValue = getTrackingValue(model, model);
 
         //Find matching option
         return options.find(function (option, index) {
