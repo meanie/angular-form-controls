@@ -40,7 +40,7 @@ angular.module('CheckBox.Component', [])
     this.$onInit = function() {
 
       //Add checkbox wrapper class to parent component
-      $element.addClass('checkbox-wrapper');
+      $element.addClass('check-box-wrapper');
 
       //Empty check override in order for ng-required to work properly
       this.ngModel.$isEmpty = function() {
