@@ -583,7 +583,6 @@
 })(window, window.angular);
 (function (window, angular, undefined) {
   'use strict';
-
   /**
    * Module definition and dependencies
    */
@@ -625,6 +624,7 @@
       var labelBy = $attrs.labelBy || null;
       var trackBy = $attrs.trackBy || null;
       var asObject = $attrs.asObject === 'true';
+      var phrase = '';
 
       //Keycodes
       var KeyCodes = {
@@ -636,11 +636,52 @@
       };
 
       /**
-       * Check if input was control
+       * Debounce helper
        */
-      function isControlInput(event) {
-        var keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC];
-        return keys.indexOf(event.keyCode) > -1;
+      function debounce(func, delay) {
+
+        //Timeout placeholder
+        var timeout = void 0;
+
+        //Create wrapper function
+        var wrapper = function wrapper() {
+
+          //Clear any existing timeout
+          if (timeout) {
+            clearTimeout(timeout);
+          }
+
+          //Create new timeout
+          timeout = setTimeout(function () {
+            return func();
+          }, delay);
+        };
+
+        //Return wrapper function
+        return wrapper;
+      }
+
+      /**
+       * Function to clear the phrase (debounced after 1.5 seconds)
+       */
+      var clearPhrase = debounce(function () {
+        phrase = '';
+      }, 1500);
+
+      /**
+       * Check if input was text
+       */
+      function isTextInput(event) {
+        if (event.keyCode >= 48 && event.keyCode <= 57) {
+          return true;
+        }
+        if (event.keyCode >= 65 && event.keyCode <= 90) {
+          return true;
+        }
+        if (event.keyCode === 32) {
+          return true;
+        }
+        return false;
       }
 
       /**
@@ -927,25 +968,44 @@
        */
       this.keydown = function (event) {
 
-        //Arrows up/down, move selection
-        if (this.isShowingOptions && isControlInput(event)) {
+        //Move selection up or down
+        if (event.keyCode === KeyCodes.UP) {
           event.preventDefault();
-          if (event.keyCode === KeyCodes.UP) {
-            moveSelectionUp();
-          } else if (event.keyCode === KeyCodes.DOWN) {
-            moveSelectionDown();
-          } else if (event.keyCode === KeyCodes.ESC) {
-            this.hideOptions();
-          } else if (event.keyCode === KeyCodes.ENTER) {
+          moveSelectionUp();
+          if (!this.isShowingOptions) {
+            this.confirmSelection();
+          }
+        } else if (event.keyCode === KeyCodes.DOWN) {
+          event.preventDefault();
+          moveSelectionDown();
+          if (!this.isShowingOptions) {
             this.confirmSelection();
           }
         }
 
-        //Show options
-        else if (event.keyCode === KeyCodes.ENTER) {
+        //Confirm selection
+        else if (event.keyCode === KeyCodes.ENTER && this.isShowingOptions) {
             event.preventDefault();
-            this.showOptions();
+            this.confirmSelection();
           }
+
+          //Hide options
+          else if (event.keyCode === KeyCodes.ESC && this.isShowingOptions) {
+              event.preventDefault();
+              this.hideOptions();
+            }
+
+            //Show options
+            else if (event.keyCode === KeyCodes.ENTER && !this.isShowingOptions) {
+                event.preventDefault();
+                this.showOptions();
+              }
+
+              //Text input
+              else if (isTextInput(event)) {
+                  var char = String.fromCharCode(event.keyCode);
+                  this.selectByInput(char);
+                }
       };
 
       /**
@@ -995,6 +1055,38 @@
        */
       this.hasOptions = function () {
         return this.options.length > 0;
+      };
+
+      /**
+       * Select by input character(s)
+       */
+      this.selectByInput = function (char) {
+
+        //Lowercase all the things
+        char = char.toLowerCase();
+
+        //Add to phrase
+        phrase += char;
+
+        //Create regex
+        var regex = new RegExp('^' + phrase, 'i');
+
+        //Find matching option
+        var option = this.options.find(function (option) {
+          var label = getLabelValue(option);
+          return label.match(regex);
+        });
+
+        //Match found?
+        if (option) {
+          var index = this.options.findIndex(function (o) {
+            return o === option;
+          });
+          this.select(option, index);
+        }
+
+        //Clear phrase (debounced)
+        clearPhrase();
       };
 
       /**
