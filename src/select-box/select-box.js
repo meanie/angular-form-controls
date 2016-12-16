@@ -1,4 +1,3 @@
-
 /**
  * Module definition and dependencies
  */
@@ -67,6 +66,7 @@ angular.module('SelectBox.Component', [])
     let labelBy = $attrs.labelBy || null;
     let trackBy = $attrs.trackBy || null;
     let asObject = ($attrs.asObject === 'true');
+    let phrase = '';
 
     //Keycodes
     const KeyCodes = {
@@ -78,11 +78,50 @@ angular.module('SelectBox.Component', [])
     };
 
     /**
-     * Check if input was control
+     * Debounce helper
      */
-    function isControlInput(event) {
-      let keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC];
-      return (keys.indexOf(event.keyCode) > -1);
+    function debounce(func, delay) {
+
+      //Timeout placeholder
+      let timeout;
+
+      //Create wrapper function
+      const wrapper = function() {
+
+        //Clear any existing timeout
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+
+        //Create new timeout
+        timeout = setTimeout(() => func(), delay);
+      };
+
+      //Return wrapper function
+      return wrapper;
+    }
+
+    /**
+     * Function to clear the phrase (debounced after 1.5 seconds)
+     */
+    const clearPhrase = debounce(() => {
+      phrase = '';
+    }, 1500);
+
+    /**
+     * Check if input was text
+     */
+    function isTextInput(event) {
+      if (event.keyCode >= 48 && event.keyCode <= 57) {
+        return true;
+      }
+      if (event.keyCode >= 65 && event.keyCode <= 90) {
+        return true;
+      }
+      if (event.keyCode === 32) {
+        return true;
+      }
+      return false;
     }
 
     /**
@@ -375,27 +414,44 @@ angular.module('SelectBox.Component', [])
      */
     this.keydown = function(event) {
 
-      //Arrows up/down, move selection
-      if (this.isShowingOptions && isControlInput(event)) {
+      //Move selection up or down
+      if (event.keyCode === KeyCodes.UP) {
         event.preventDefault();
-        if (event.keyCode === KeyCodes.UP) {
-          moveSelectionUp();
+        moveSelectionUp();
+        if (!this.isShowingOptions) {
+          this.confirmSelection();
         }
-        else if (event.keyCode === KeyCodes.DOWN) {
-          moveSelectionDown();
-        }
-        else if (event.keyCode === KeyCodes.ESC) {
-          this.hideOptions();
-        }
-        else if (event.keyCode === KeyCodes.ENTER) {
+      }
+      else if (event.keyCode === KeyCodes.DOWN) {
+        event.preventDefault();
+        moveSelectionDown();
+        if (!this.isShowingOptions) {
           this.confirmSelection();
         }
       }
 
+      //Confirm selection
+      else if (event.keyCode === KeyCodes.ENTER && this.isShowingOptions) {
+        event.preventDefault();
+        this.confirmSelection();
+      }
+
+      //Hide options
+      else if (event.keyCode === KeyCodes.ESC && this.isShowingOptions) {
+        event.preventDefault();
+        this.hideOptions();
+      }
+
       //Show options
-      else if (event.keyCode === KeyCodes.ENTER) {
+      else if (event.keyCode === KeyCodes.ENTER && !this.isShowingOptions) {
         event.preventDefault();
         this.showOptions();
+      }
+
+      //Text input
+      else if (isTextInput(event)) {
+        const char = String.fromCharCode(event.keyCode);
+        this.selectByInput(char);
       }
     };
 
@@ -447,6 +503,36 @@ angular.module('SelectBox.Component', [])
      */
     this.hasOptions = function() {
       return (this.options.length > 0);
+    };
+
+    /**
+     * Select by input character(s)
+     */
+    this.selectByInput = function(char) {
+
+      //Lowercase all the things
+      char = char.toLowerCase();
+
+      //Add to phrase
+      phrase += char;
+
+      //Create regex
+      const regex = new RegExp('^' + phrase, 'i');
+
+      //Find matching option
+      const option = this.options.find(option => {
+        const label = getLabelValue(option);
+        return label.match(regex);
+      });
+
+      //Match found?
+      if (option) {
+        const index = this.options.findIndex(o => o === option);
+        this.select(option, index);
+      }
+
+      //Clear phrase (debounced)
+      clearPhrase();
     };
 
     /**
