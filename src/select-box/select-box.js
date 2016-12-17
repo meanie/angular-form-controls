@@ -417,16 +417,20 @@ angular.module('SelectBox.Component', [])
       //Move selection up or down
       if (event.keyCode === KeyCodes.UP) {
         event.preventDefault();
-        moveSelectionUp();
-        if (!this.isShowingOptions) {
-          this.confirmSelection();
+        if (this.isShowingOptions) {
+          moveSelectionUp();
+        }
+        else {
+          this.showOptions();
         }
       }
       else if (event.keyCode === KeyCodes.DOWN) {
         event.preventDefault();
-        moveSelectionDown();
-        if (!this.isShowingOptions) {
-          this.confirmSelection();
+        if (this.isShowingOptions) {
+          moveSelectionDown();
+        }
+        else {
+          this.showOptions();
         }
       }
 
