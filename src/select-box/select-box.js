@@ -61,8 +61,8 @@ angular.module('SelectBox.Component', [])
   controller($element, $attrs, $log, $formControls, $scope, $document) {
 
     //Helper vars
-    let $ctrl = this;
-    let selectionIndex, $input, $container, $options;
+    const $ctrl = this;
+    let selectionIndex, $input, $container;
     let labelBy = $attrs.labelBy || null;
     let trackBy = $attrs.trackBy || null;
     let asObject = ($attrs.asObject === 'true');
@@ -145,17 +145,20 @@ angular.module('SelectBox.Component', [])
         return;
       }
 
+      //Find options
+      const $options = $container.children();
+
       //Get option now, taking into account the additional nullable element
-      let option = $options[selectionIndex + ($ctrl.isNullable ? 1 : 0)];
+      const option = $options[selectionIndex + ($ctrl.isNullable ? 1 : 0)];
       if (!option) {
         return;
       }
 
       //Determine container and element top and bottom
-      let cTop = $container[0].scrollTop;
-      let cBottom = cTop + $container[0].clientHeight;
-      let eTop = option.offsetTop;
-      let eBottom = eTop + option.clientHeight;
+      const cTop = $container[0].scrollTop;
+      const cBottom = cTop + $container[0].clientHeight;
+      const eTop = option.offsetTop;
+      const eBottom = eTop + option.clientHeight;
 
       //Check if out of view
       if (eTop < cTop) {
@@ -343,8 +346,7 @@ angular.module('SelectBox.Component', [])
 
       //Find some elements
       $input = $element.find('input');
-      $container = $input.parent().next();
-      $options = $container.find('li');
+      $container = $input.parent().parent().next();
 
       //Apply document click handler
       //NOTE: applied on body, so that it can prevent global $document handlers
