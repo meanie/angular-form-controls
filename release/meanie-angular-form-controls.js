@@ -619,8 +619,7 @@
       var $ctrl = this;
       var selectionIndex = void 0,
           $input = void 0,
-          $container = void 0,
-          $options = void 0;
+          $container = void 0;
       var labelBy = $attrs.labelBy || null;
       var trackBy = $attrs.trackBy || null;
       var asObject = $attrs.asObject === 'true';
@@ -704,6 +703,9 @@
         if (!$ctrl.isNullable && selectionIndex < 0) {
           return;
         }
+
+        //Find options
+        var $options = $container.children();
 
         //Get option now, taking into account the additional nullable element
         var option = $options[selectionIndex + ($ctrl.isNullable ? 1 : 0)];
@@ -897,8 +899,7 @@
 
         //Find some elements
         $input = $element.find('input');
-        $container = $input.parent().next();
-        $options = $container.find('li');
+        $container = $input.parent().parent().next();
 
         //Apply document click handler
         //NOTE: applied on body, so that it can prevent global $document handlers
