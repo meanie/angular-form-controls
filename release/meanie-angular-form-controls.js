@@ -263,9 +263,16 @@
         this.ngModel.$isEmpty = function () {
 
           //Needed here to prevent $validate from setting the model to undefined
-          $ctrl.ngModel.$$setOptions({
-            allowInvalid: true
-          });
+          //NOTE: first approach for Angular < 1.6.0
+          if (typeof $ctrl.ngModel.$$setOptions === 'function') {
+            $ctrl.ngModel.$$setOptions({
+              allowInvalid: true
+            });
+          } else {
+            $ctrl.ngModel.$options = $ctrl.ngModel.$options.createChild({
+              allowInvalid: true
+            });
+          }
 
           //Return check now
           return !angular.isArray($ctrl.model) || $ctrl.model.length === 0;
