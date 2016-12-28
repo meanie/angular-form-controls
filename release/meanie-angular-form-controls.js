@@ -672,7 +672,7 @@
        */
       var clearPhrase = debounce(function () {
         phrase = '';
-      }, 1500);
+      }, 1000);
 
       /**
        * Check if input was text
