@@ -534,7 +534,7 @@ angular.module('SelectBox.Component', [])
       //Match found?
       if (option) {
         const index = this.options.findIndex(o => o === option);
-        this.select(option, index);
+        this.select(option, index, true);
       }
 
       //Clear phrase (debounced)
@@ -544,7 +544,7 @@ angular.module('SelectBox.Component', [])
     /**
      * Select an option
      */
-    this.select = function(option, index) {
+    this.select = function(option, index, leaveOpen) {
 
       //Ignore when disabled
       if (this.isDisabled) {
@@ -552,7 +552,12 @@ angular.module('SelectBox.Component', [])
       }
 
       //Hide options
-      this.hideOptions();
+      if (!leaveOpen) {
+        this.hideOptions();
+      }
+      else {
+        ensureSelectionInView();
+      }
 
       //Get the new model value and call on change handler
       let value = getModelValue(option, index);
