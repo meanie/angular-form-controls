@@ -1092,7 +1092,7 @@
           var index = this.options.findIndex(function (o) {
             return o === option;
           });
-          this.select(option, index);
+          this.select(option, index, true);
         }
 
         //Clear phrase (debounced)
@@ -1102,7 +1102,7 @@
       /**
        * Select an option
        */
-      this.select = function (option, index) {
+      this.select = function (option, index, leaveOpen) {
 
         //Ignore when disabled
         if (this.isDisabled) {
@@ -1110,7 +1110,11 @@
         }
 
         //Hide options
-        this.hideOptions();
+        if (!leaveOpen) {
+          this.hideOptions();
+        } else {
+          ensureSelectionInView();
+        }
 
         //Get the new model value and call on change handler
         var value = getModelValue(option, index);
