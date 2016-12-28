@@ -106,7 +106,7 @@ angular.module('SelectBox.Component', [])
      */
     const clearPhrase = debounce(() => {
       phrase = '';
-    }, 1500);
+    }, 1000);
 
     /**
      * Check if input was text
