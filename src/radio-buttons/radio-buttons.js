@@ -9,7 +9,7 @@ angular.module('RadioButtons.Component', [])
  */
 .component('radioButtons', {
   template:
-    `<div class="radio-button-group {{$ctrl.classes}}">
+    `<div class="box-group {{$ctrl.classes}}">
       <label class="radio-button"
         ng-if="$ctrl.isNullable"
         ng-click="$ctrl.select(null)"
