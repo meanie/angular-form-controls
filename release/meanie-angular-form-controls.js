@@ -1,7 +1,7 @@
 /**
  * meanie-angular-form-controls * https://github.com/meanie/angular-form-controls
  *
- * Copyright (c) 2016 Adam Reis <adam@reis.nz>
+ * Copyright (c) 2017 Adam Reis <adam@reis.nz>
  * License: MIT
  */
 (function (window, angular, undefined) {
@@ -143,7 +143,7 @@
    * Checkboxes component
    */
   .component('checkBoxes', {
-    template: '<div class="check-box-group {{$ctrl.classes}}">\n      <label class="check-box"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.toggle(option, $index)"\n        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
+    template: '<div class="box-group {{$ctrl.classes}}">\n      <label class="check-box"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.toggle(option, $index)"\n        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
     require: {
       ngModel: 'ngModel'
     },
@@ -364,7 +364,7 @@
    * Radio buttons component
    */
   .component('radioButtons', {
-    template: '<div class="radio-button-group {{$ctrl.classes}}">\n      <label class="radio-button"\n        ng-if="$ctrl.isNullable"\n        ng-click="$ctrl.select(null)"\n        ng-class="{checked: $ctrl.isSelected(null), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.nullLabel}}</label>\n      <label class="radio-button"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.select(option, $index)"\n        ng-class="{checked: $ctrl.isSelected(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
+    template: '<div class="box-group {{$ctrl.classes}}">\n      <label class="radio-button"\n        ng-if="$ctrl.isNullable"\n        ng-click="$ctrl.select(null)"\n        ng-class="{checked: $ctrl.isSelected(null), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.nullLabel}}</label>\n      <label class="radio-button"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.select(option, $index)"\n        ng-class="{checked: $ctrl.isSelected(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
     require: {
       ngModel: 'ngModel'
     },
