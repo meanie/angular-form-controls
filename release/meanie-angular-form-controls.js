@@ -1,7 +1,7 @@
 /**
  * meanie-angular-form-controls * https://github.com/meanie/angular-form-controls
  *
- * Copyright (c) 2016 Adam Reis <adam@reis.nz>
+ * Copyright (c) 2017 Adam Reis <adam@reis.nz>
  * License: MIT
  */
 (function (window, angular, undefined) {
@@ -63,8 +63,7 @@
       model: '<ngModel',
       onChange: '&',
       isInverse: '<isInverse',
-      isDisabled: '<ngDisabled',
-      isRequired: '<ngRequired'
+      isDisabled: '<ngDisabled'
     },
 
     /**
@@ -151,8 +150,7 @@
       model: '<ngModel',
       options: '<',
       onChange: '&',
-      isDisabled: '<ngDisabled',
-      isRequired: '<ngRequired'
+      isDisabled: '<ngDisabled'
     },
 
     /**
@@ -375,8 +373,7 @@
       isNullable: '<',
       nullValue: '<',
       nullLabel: '<',
-      isDisabled: '<ngDisabled',
-      isRequired: '<ngRequired'
+      isDisabled: '<ngDisabled'
     },
 
     /**
@@ -613,7 +610,6 @@
       nullValue: '<',
       nullLabel: '<',
       isDisabled: '<ngDisabled',
-      isRequired: '<ngRequired',
       hasSpinner: '<hasSpinner'
     },
 
@@ -1196,7 +1192,6 @@
       onChange: '&',
       onQuery: '&',
       isDisabled: '<ngDisabled',
-      isRequired: '<ngRequired',
       labelBy: '@',
       trackBy: '@',
       asObject: '@',
