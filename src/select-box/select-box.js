@@ -51,7 +51,6 @@ angular.module('SelectBox.Component', [])
     nullValue: '<',
     nullLabel: '<',
     isDisabled: '<ngDisabled',
-    isRequired: '<ngRequired',
     hasSpinner: '<hasSpinner',
   },
 

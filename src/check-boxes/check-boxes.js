@@ -24,7 +24,6 @@ angular.module('CheckBoxes.Component', [])
     options: '<',
     onChange: '&',
     isDisabled: '<ngDisabled',
-    isRequired: '<ngRequired',
   },
 
   /**

@@ -43,7 +43,6 @@ angular.module('TypeAhead.Component', [])
     onChange: '&',
     onQuery: '&',
     isDisabled: '<ngDisabled',
-    isRequired: '<ngRequired',
     labelBy: '@',
     trackBy: '@',
     asObject: '@',

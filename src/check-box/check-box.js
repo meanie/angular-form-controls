@@ -23,7 +23,6 @@ angular.module('CheckBox.Component', [])
     onChange: '&',
     isInverse: '<isInverse',
     isDisabled: '<ngDisabled',
-    isRequired: '<ngRequired',
   },
 
   /**

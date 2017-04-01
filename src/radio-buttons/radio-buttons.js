@@ -32,7 +32,6 @@ angular.module('RadioButtons.Component', [])
     nullValue: '<',
     nullLabel: '<',
     isDisabled: '<ngDisabled',
-    isRequired: '<ngRequired',
   },
 
   /**
