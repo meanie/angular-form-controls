@@ -57,7 +57,9 @@ angular.module('SelectBox.Component', [])
   /**
    * Component controller
    */
-  controller($element, $attrs, $log, $formControls, $scope, $document) {
+  controller(
+    $element, $attrs, $log, $formControls, $scope, $document, $timeout, $window
+  ) {
 
     //Helper vars
     const $ctrl = this;
@@ -131,6 +133,65 @@ angular.module('SelectBox.Component', [])
         $scope.$apply($ctrl.hideOptions.bind($ctrl));
         event.preventDefault();
         event.stopPropagation();
+      }
+    }
+
+    /**
+     * Find scrollable parent
+     */
+    function findScrollableParent($child) {
+
+      //Get parent
+      const $parent = $child.parent();
+      if ($parent.length === 0) {
+        return null;
+      }
+
+      //Get style
+      const style = $window.getComputedStyle($parent[0]);
+
+      //Find element that has auto overflow or which is the body
+      if ($parent[0].tagName === 'BODY' || style.overflowY === 'auto') {
+        return $parent;
+      }
+
+      //Find next
+      return findScrollableParent($parent);
+    }
+
+    /**
+     * Find offset relative to a certain node
+     */
+    function findOffset(node, relativeNode) {
+      let offset = node.offsetTop;
+      while (node.offsetParent && node.offsetParent !== relativeNode) {
+        node = node.offsetParent;
+        offset += node.offsetTop;
+      }
+      return offset;
+    }
+
+    /**
+     * Ensure the whole dropdown is in view
+     */
+    function ensureDropdownInView() {
+
+      //Find scrollable parent
+      const $parent = findScrollableParent($element);
+      if (!$parent) {
+        return;
+      }
+
+      //Get params
+      const offset = findOffset($container[0], $parent[0]);
+      const height = $parent[0].clientHeight;
+      const scroll = $parent[0].scrollTop;
+      const bottom = offset - scroll + $container[0].clientHeight;
+
+      //Check if it's outside of the height
+      if (bottom > height) {
+        const diff = bottom - height + 16;
+        $parent[0].scrollTop += diff;
       }
     }
 
@@ -481,6 +542,9 @@ angular.module('SelectBox.Component', [])
     this.showOptions = function() {
       if (!this.isDisabled && !this.hasSpinner) {
         this.isShowingOptions = true;
+        $timeout(() => {
+          ensureDropdownInView();
+        });
       }
     };
 
