@@ -22,6 +22,8 @@ angular.module('CheckBoxes.Component', [])
   bindings: {
     model: '<ngModel',
     options: '<',
+    min: '<',
+    max: '<',
     onChange: '&',
     isDisabled: '<ngDisabled',
   },
@@ -129,6 +131,26 @@ angular.module('CheckBoxes.Component', [])
       //Propagate classes
       this.classes = $element[0].className;
       $element[0].className = '';
+
+      //Validation for min/max values
+      this.ngModel.$validators.min = function(modelValue) {
+        if ($ctrl.ngModel.$error.required) {
+          return true;
+        }
+        if (!$ctrl.min || $ctrl.min < 0) {
+          return true;
+        }
+        return (!angular.isArray(modelValue) || modelValue.length >= $ctrl.min);
+      };
+      this.ngModel.$validators.max = function(modelValue) {
+        if ($ctrl.ngModel.$error.required) {
+          return true;
+        }
+        if (!$ctrl.max || $ctrl.max < 0) {
+          return true;
+        }
+        return (!angular.isArray(modelValue) || modelValue.length <= $ctrl.max);
+      };
 
       //Empty check override in order for ng-required to work properly
       this.ngModel.$isEmpty = function() {
