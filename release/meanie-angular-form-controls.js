@@ -149,6 +149,8 @@
     bindings: {
       model: '<ngModel',
       options: '<',
+      min: '<',
+      max: '<',
       onChange: '&',
       isDisabled: '<ngDisabled'
     },
@@ -256,6 +258,26 @@
         //Propagate classes
         this.classes = $element[0].className;
         $element[0].className = '';
+
+        //Validation for min/max values
+        this.ngModel.$validators.min = function (modelValue) {
+          if ($ctrl.ngModel.$error.required) {
+            return true;
+          }
+          if (!$ctrl.min || $ctrl.min < 0) {
+            return true;
+          }
+          return !angular.isArray(modelValue) || modelValue.length >= $ctrl.min;
+        };
+        this.ngModel.$validators.max = function (modelValue) {
+          if ($ctrl.ngModel.$error.required) {
+            return true;
+          }
+          if (!$ctrl.max || $ctrl.max < 0) {
+            return true;
+          }
+          return !angular.isArray(modelValue) || modelValue.length <= $ctrl.max;
+        };
 
         //Empty check override in order for ng-required to work properly
         this.ngModel.$isEmpty = function () {
@@ -581,582 +603,6 @@
         //Get the new model value and call on change handler
         var value = getModelValue(option, index);
         this.onChange({ value: value, option: option });
-      };
-    }]
-  });
-})(window, window.angular);
-(function (window, angular, undefined) {
-  'use strict';
-  /**
-   * Module definition and dependencies
-   */
-
-  angular.module('TypeAhead.Component', [])
-
-  /**
-   * Type ahead component
-   */
-  .component('typeAhead', {
-    template: '<div class="type-ahead">\n      <span class="form-control-spinner"\n        ng-class="{\'show-spinner\': $ctrl.isSearching}">\n        <input class="form-control" type="text"\n          placeholder="{{$ctrl.placeholder}}"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-keyup="$ctrl.keyup($event)"\n          ng-disabled="$ctrl.isDisabled"\n          ng-model="$ctrl.searchQuery">\n        <spinner></spinner>\n      </span>\n      <ul class="type-ahead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
-    transclude: true,
-    require: {
-      ngModel: 'ngModel'
-    },
-    bindings: {
-      model: '<ngModel',
-      options: '<',
-      placeholder: '@',
-      onSearch: '&',
-      onChange: '&',
-      onQuery: '&',
-      isDisabled: '<ngDisabled',
-      labelBy: '@',
-      trackBy: '@',
-      asObject: '@',
-      minLength: '@',
-      allowNew: '@'
-    },
-
-    /**
-     * Component controller
-     */
-    controller: ['$element', '$scope', '$formControls', '$attrs', '$log', '$q', '$timeout', '$document', function controller($element, $scope, $formControls, $attrs, $log, $q, $timeout, $document) {
-
-      //Helper vars
-      var $input = void 0,
-          $container = void 0,
-          $options = void 0;
-      var $ctrl = this;
-      var selectionIndex = -1;
-      var debounce = 100;
-      var labelBy = $attrs.labelBy || null;
-      var trackBy = $attrs.trackBy || null;
-      var asObject = $attrs.asObject === 'true';
-      var allowNew = $attrs.allowNew === 'true';
-
-      //Keep track of searches, prevent older searches overwriting newer ones
-      var currentSearch = 0;
-      var lastProcessedSearch = 0;
-      var pendingSearch = null;
-
-      //Keycodes
-      var KeyCodes = {
-        ENTER: 13,
-        ESC: 27,
-        SPACE: 32,
-        TAB: 9,
-        UP: 38,
-        DOWN: 40
-      };
-
-      /**
-       * Check if input was control
-       */
-      function isControlInput(event) {
-        var keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB];
-        return keys.indexOf(event.keyCode) > -1;
-      }
-
-      /**
-       * Click handler for document
-       */
-      function documentClickHandler(event) {
-        if (!$input[0].contains(event.target) && $ctrl.isShowingResults) {
-          $scope.$apply($ctrl.hideResults.bind($ctrl));
-          event.preventDefault();
-          event.stopPropagation();
-        }
-      }
-
-      /**
-       * Ensure the selected option is in view
-       */
-      function ensureSelectionInView() {
-
-        //Check index
-        if (!$ctrl.isNullable && selectionIndex < 0) {
-          return;
-        }
-
-        //Get option now, taking into account the additional nullable element
-        var option = $options[selectionIndex + ($ctrl.isNullable ? 1 : 0)];
-        if (!option) {
-          return;
-        }
-
-        //Determine container and element top and bottom
-        var cTop = $container[0].scrollTop;
-        var cBottom = cTop + $container[0].clientHeight;
-        var eTop = option.offsetTop;
-        var eBottom = eTop + option.clientHeight;
-
-        //Check if out of view
-        if (eTop < cTop) {
-          $container[0].scrollTop -= cTop - eTop;
-        } else if (eBottom > cBottom) {
-          $container[0].scrollTop += eBottom - cBottom;
-        }
-      }
-
-      /**
-       * Move selection up
-       */
-      function moveSelectionUp() {
-        var oldIndex = selectionIndex;
-        if (typeof selectionIndex === 'undefined') {
-          if ($ctrl.isNullable) {
-            selectionIndex = -1;
-          } else if ($ctrl.options.length > 0) {
-            selectionIndex = $ctrl.options.length - 1;
-          }
-        } else if (selectionIndex > ($ctrl.isNullable ? -1 : 0)) {
-          selectionIndex--;
-        }
-        if (oldIndex !== selectionIndex) {
-          ensureSelectionInView();
-        }
-      }
-
-      /**
-       * Move selection down
-       */
-      function moveSelectionDown() {
-        var oldIndex = selectionIndex;
-        if (typeof selectionIndex === 'undefined') {
-          if ($ctrl.isNullable) {
-            selectionIndex = -1;
-          } else if ($ctrl.options.length > 0) {
-            selectionIndex = 0;
-          }
-        } else if (selectionIndex < $ctrl.options.length - 1) {
-          selectionIndex++;
-        }
-        if (oldIndex !== selectionIndex) {
-          ensureSelectionInView();
-        }
-      }
-
-      /**
-       * Helper to get the tracking value of an option
-       */
-      function getTrackingValue(option) {
-
-        //Non object? Track by its value
-        if (option === null || !angular.isObject(option)) {
-          return option;
-        }
-
-        //Must have tracking property
-        if (!trackBy) {
-          $log.warn('Missing track-by property for type ahead');
-          return null;
-        }
-
-        //Validate property
-        if (typeof option[trackBy] === 'undefined') {
-          $log.warn('Unknown property `' + trackBy + '` for type ahead tracking');
-          return null;
-        }
-
-        //Return the property
-        return option[trackBy];
-      }
-
-      /**
-       * Get the model value
-       */
-      function getModelValue(option) {
-
-        //If returning as object, return the selected option
-        if (asObject) {
-          return option;
-        }
-
-        //Otherwise, return the tracking value of the given option
-        return getTrackingValue(option);
-      }
-
-      /**
-       * Get label value of an option
-       */
-      function getLabelValue(option) {
-
-        //Null value?
-        if (option === null || typeof option === 'undefined') {
-          return '';
-        }
-
-        //Non object? Use its value
-        if (!angular.isObject(option)) {
-          return option;
-        }
-
-        //Must have label property
-        if (!labelBy) {
-          $log.warn('Missing label-by property for type ahead');
-          return '';
-        }
-
-        //Validate property
-        if (typeof option[labelBy] === 'undefined') {
-          $log.warn('Unknown property `' + labelBy + '` for type ahead label');
-          return '';
-        }
-
-        //Return the property
-        return option[labelBy];
-      }
-
-      /**
-       * Find the selected option based on the model value
-       */
-      function findOption(model, options) {
-
-        //Nothing selected or null value selected?
-        if (typeof model === 'undefined' || model === $ctrl.nullValue) {
-          return null;
-        }
-
-        //Tracking by index?
-        if (trackBy === '$index') {
-          if (typeof options[model] !== 'undefined') {
-            return options[model];
-          }
-          return null;
-        }
-
-        //Get the model value
-        var modelValue = getTrackingValue(model, model);
-
-        //Find matching option
-        return options.find(function (option, index) {
-          var optionValue = getTrackingValue(option, index);
-          return modelValue === optionValue;
-        });
-      }
-
-      /**
-       * Do a simple search on object property
-       */
-      function searchOptions(value) {
-        if (!value) {
-          return $q.resolve([]);
-        }
-        var regex = new RegExp('(?:^|\\b)(' + value + ')', 'i');
-        var items = $ctrl.options.filter(function (option) {
-          var label = getLabelValue(option);
-          return regex.test(label);
-        });
-        return $q.resolve(items);
-      }
-
-      /**
-       * Init
-       */
-      this.$onInit = function () {
-
-        //Find some elements
-        $input = $element.find('input');
-        $container = $input.parent().next();
-        $options = $container.find('li');
-
-        //Propagate focus
-        $element.attr('tabindex', -1);
-        $element.on('focus', function () {
-          $input[0].focus();
-        });
-
-        //Apply document click handler
-        //NOTE: applied on body, so that it can prevent global $document handlers
-        $document.find('body').on('click', documentClickHandler);
-
-        //Initialize results and flags
-        this.results = [];
-        this.isSearching = false;
-        this.isShowingResults = false;
-
-        //Empty check override in order for ng-required to work properly
-        this.ngModel.$isEmpty = function () {
-          if ($ctrl.model === null || typeof $ctrl.model === 'undefined') {
-            if (allowNew && $ctrl.searchQuery) {
-              return false;
-            }
-            return true;
-          }
-          return false;
-        };
-      };
-
-      /**
-       * Destroy
-       */
-      this.$onDestroy = function () {
-        $document.find('body').off('click', documentClickHandler);
-      };
-
-      /**
-       * Change handler
-       */
-      this.$onChanges = function (changes) {
-
-        //Validate and mark as dirty if needed
-        if (changes.model) {
-
-          //Only update search query when we have a model
-          //This is to prevent the input from being cleared when we go and edit
-          if (this.model) {
-            var option = void 0;
-            if (angular.isArray(this.options)) {
-              option = findOption(this.model, this.options);
-            } else if (angular.isObject(this.model)) {
-              option = this.model;
-            }
-            if (option) {
-              this.searchQuery = getLabelValue(option);
-            }
-          }
-
-          //Validate model
-          this.ngModel.$validate();
-          if ($formControls.hasChanged(changes.model)) {
-            this.ngModel.$setDirty();
-          }
-        }
-      };
-
-      /**
-       * Get label value of an option
-       */
-      this.getLabel = function (option) {
-        return getLabelValue(option);
-      };
-
-      /**
-       * Key down handler
-       */
-      this.keydown = function (event) {
-
-        //Arrows up/down, move selection
-        if (this.isShowingResults && isControlInput(event)) {
-          if (event.keyCode === KeyCodes.UP) {
-            event.preventDefault();
-            moveSelectionUp();
-          } else if (event.keyCode === KeyCodes.DOWN) {
-            event.preventDefault();
-            moveSelectionDown();
-          } else if (event.keyCode === KeyCodes.ESC) {
-            event.preventDefault();
-            this.hideResults();
-          } else if (event.keyCode === KeyCodes.TAB) {
-            //Don't prevent default
-            this.hideResults();
-          } else if (event.keyCode === KeyCodes.ENTER) {
-            event.preventDefault();
-            this.confirmSelection();
-          }
-        }
-
-        //Show options
-        else if (event.keyCode === KeyCodes.ENTER) {
-            event.preventDefault();
-            this.showResults();
-          }
-      };
-
-      /**
-       * Key up handler
-       */
-      this.keyup = function (event) {
-
-        //If control input, skip further handling
-        if (isControlInput(event)) {
-          return;
-        }
-
-        //Get search query
-        var value = (this.searchQuery || '').trim();
-
-        //Call event handlers
-        this.onQuery({ value: value });
-        this.onChange({ value: null, option: null });
-
-        //Validate and mark as dirty
-        this.ngModel.$validate();
-        this.ngModel.$setDirty();
-
-        //Should we search?
-        if (!this.minLength || value.length >= this.minLength) {
-          this.search(value);
-        } else if (this.hasResults()) {
-          this.clearResults();
-          this.clearSelection();
-        }
-      };
-
-      /**************************************************************************
-       * Search
-       ***/
-
-      /**
-       * Search wrapper
-       */
-      this.search = function (value) {
-        var _this = this;
-
-        //Create new debounced search
-        pendingSearch = $timeout(function () {
-          pendingSearch = null;
-          return _this.doSearch(value);
-        }, debounce);
-
-        //Return the promise
-        return pendingSearch;
-      };
-
-      /**
-       * Actual search handler
-       */
-      this.doSearch = function (value) {
-        var _this2 = this;
-
-        //Determine search handler
-        var search = void 0;
-        if (this.options && angular.isArray(this.options)) {
-          search = searchOptions(value);
-        } else if ($attrs.onSearch) {
-          search = this.onSearch({ value: value });
-        } else {
-          $log.warn('No search handler or options specified');
-          return $q.reject();
-        }
-
-        //Toggle flag
-        this.isSearching = true;
-
-        //Return search promise
-        return search
-
-        //Check if we've gotten an old search back
-        .then(function (results) {
-          if (++currentSearch > lastProcessedSearch) {
-            return results;
-          }
-          return $q.reject('old search');
-        })
-
-        //Process the results
-        .then(function (results) {
-          _this2.clearSelection();
-          _this2.results = results;
-          if (results && results.length > 0) {
-            _this2.isShowingResults = true;
-          }
-        })
-
-        //Done searching
-        .finally(function () {
-          return _this2.isSearching = false;
-        });
-      };
-
-      /**************************************************************************
-       * Results navigation & handling
-       ***/
-
-      /**
-       * Check if we have results
-       */
-      this.hasResults = function () {
-        return this.results && this.results.length > 0;
-      };
-
-      /**
-       * Clear results
-       */
-      this.clearResults = function () {
-        this.results = [];
-        this.isShowingResults = false;
-      };
-
-      /**
-       * Show results
-       */
-      this.showResults = function () {
-        if (this.hasResults()) {
-          this.isShowingResults = true;
-        }
-      };
-
-      /**
-       * Select an option
-       */
-      this.select = function (option) {
-
-        //Ignore when disabled
-        if (this.isDisabled) {
-          return;
-        }
-
-        //Hide options
-        this.hideResults();
-
-        //Get the new model and label values
-        var value = getModelValue(option);
-        var label = getLabelValue(option);
-
-        //Set as search query
-        this.searchQuery = label;
-
-        //Call event handlers
-        this.onQuery({ value: label });
-        this.onChange({ value: value, option: option });
-      };
-
-      /**
-       * Hide results
-       */
-      this.hideResults = function () {
-        this.isShowingResults = false;
-      };
-
-      /**
-       * Set the selection index
-       */
-      this.setSelection = function (index) {
-        selectionIndex = index;
-      };
-
-      /**
-       * Check if given index is the selection index
-       */
-      this.isSelection = function (index) {
-        return selectionIndex === index;
-      };
-
-      /**
-       * Clear selection
-       */
-      this.clearSelection = function () {
-        selectionIndex = undefined;
-      };
-
-      /**
-       * Confirm selection
-       */
-      this.confirmSelection = function (index) {
-
-        //If index not given, use current selection index
-        if (typeof index === 'undefined') {
-          index = selectionIndex;
-        }
-
-        //Validate index
-        if (this.results.length === 0 || typeof this.results[index] === 'undefined') {
-          return;
-        }
-
-        //Select result
-        this.select(this.results[index]);
       };
     }]
   });
@@ -1801,6 +1247,582 @@
 
         //Select option now
         this.select(option, index);
+      };
+    }]
+  });
+})(window, window.angular);
+(function (window, angular, undefined) {
+  'use strict';
+  /**
+   * Module definition and dependencies
+   */
+
+  angular.module('TypeAhead.Component', [])
+
+  /**
+   * Type ahead component
+   */
+  .component('typeAhead', {
+    template: '<div class="type-ahead">\n      <span class="form-control-spinner"\n        ng-class="{\'show-spinner\': $ctrl.isSearching}">\n        <input class="form-control" type="text"\n          placeholder="{{$ctrl.placeholder}}"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-keyup="$ctrl.keyup($event)"\n          ng-disabled="$ctrl.isDisabled"\n          ng-model="$ctrl.searchQuery">\n        <spinner></spinner>\n      </span>\n      <ul class="type-ahead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
+    transclude: true,
+    require: {
+      ngModel: 'ngModel'
+    },
+    bindings: {
+      model: '<ngModel',
+      options: '<',
+      placeholder: '@',
+      onSearch: '&',
+      onChange: '&',
+      onQuery: '&',
+      isDisabled: '<ngDisabled',
+      labelBy: '@',
+      trackBy: '@',
+      asObject: '@',
+      minLength: '@',
+      allowNew: '@'
+    },
+
+    /**
+     * Component controller
+     */
+    controller: ['$element', '$scope', '$formControls', '$attrs', '$log', '$q', '$timeout', '$document', function controller($element, $scope, $formControls, $attrs, $log, $q, $timeout, $document) {
+
+      //Helper vars
+      var $input = void 0,
+          $container = void 0,
+          $options = void 0;
+      var $ctrl = this;
+      var selectionIndex = -1;
+      var debounce = 100;
+      var labelBy = $attrs.labelBy || null;
+      var trackBy = $attrs.trackBy || null;
+      var asObject = $attrs.asObject === 'true';
+      var allowNew = $attrs.allowNew === 'true';
+
+      //Keep track of searches, prevent older searches overwriting newer ones
+      var currentSearch = 0;
+      var lastProcessedSearch = 0;
+      var pendingSearch = null;
+
+      //Keycodes
+      var KeyCodes = {
+        ENTER: 13,
+        ESC: 27,
+        SPACE: 32,
+        TAB: 9,
+        UP: 38,
+        DOWN: 40
+      };
+
+      /**
+       * Check if input was control
+       */
+      function isControlInput(event) {
+        var keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB];
+        return keys.indexOf(event.keyCode) > -1;
+      }
+
+      /**
+       * Click handler for document
+       */
+      function documentClickHandler(event) {
+        if (!$input[0].contains(event.target) && $ctrl.isShowingResults) {
+          $scope.$apply($ctrl.hideResults.bind($ctrl));
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      }
+
+      /**
+       * Ensure the selected option is in view
+       */
+      function ensureSelectionInView() {
+
+        //Check index
+        if (!$ctrl.isNullable && selectionIndex < 0) {
+          return;
+        }
+
+        //Get option now, taking into account the additional nullable element
+        var option = $options[selectionIndex + ($ctrl.isNullable ? 1 : 0)];
+        if (!option) {
+          return;
+        }
+
+        //Determine container and element top and bottom
+        var cTop = $container[0].scrollTop;
+        var cBottom = cTop + $container[0].clientHeight;
+        var eTop = option.offsetTop;
+        var eBottom = eTop + option.clientHeight;
+
+        //Check if out of view
+        if (eTop < cTop) {
+          $container[0].scrollTop -= cTop - eTop;
+        } else if (eBottom > cBottom) {
+          $container[0].scrollTop += eBottom - cBottom;
+        }
+      }
+
+      /**
+       * Move selection up
+       */
+      function moveSelectionUp() {
+        var oldIndex = selectionIndex;
+        if (typeof selectionIndex === 'undefined') {
+          if ($ctrl.isNullable) {
+            selectionIndex = -1;
+          } else if ($ctrl.options.length > 0) {
+            selectionIndex = $ctrl.options.length - 1;
+          }
+        } else if (selectionIndex > ($ctrl.isNullable ? -1 : 0)) {
+          selectionIndex--;
+        }
+        if (oldIndex !== selectionIndex) {
+          ensureSelectionInView();
+        }
+      }
+
+      /**
+       * Move selection down
+       */
+      function moveSelectionDown() {
+        var oldIndex = selectionIndex;
+        if (typeof selectionIndex === 'undefined') {
+          if ($ctrl.isNullable) {
+            selectionIndex = -1;
+          } else if ($ctrl.options.length > 0) {
+            selectionIndex = 0;
+          }
+        } else if (selectionIndex < $ctrl.options.length - 1) {
+          selectionIndex++;
+        }
+        if (oldIndex !== selectionIndex) {
+          ensureSelectionInView();
+        }
+      }
+
+      /**
+       * Helper to get the tracking value of an option
+       */
+      function getTrackingValue(option) {
+
+        //Non object? Track by its value
+        if (option === null || !angular.isObject(option)) {
+          return option;
+        }
+
+        //Must have tracking property
+        if (!trackBy) {
+          $log.warn('Missing track-by property for type ahead');
+          return null;
+        }
+
+        //Validate property
+        if (typeof option[trackBy] === 'undefined') {
+          $log.warn('Unknown property `' + trackBy + '` for type ahead tracking');
+          return null;
+        }
+
+        //Return the property
+        return option[trackBy];
+      }
+
+      /**
+       * Get the model value
+       */
+      function getModelValue(option) {
+
+        //If returning as object, return the selected option
+        if (asObject) {
+          return option;
+        }
+
+        //Otherwise, return the tracking value of the given option
+        return getTrackingValue(option);
+      }
+
+      /**
+       * Get label value of an option
+       */
+      function getLabelValue(option) {
+
+        //Null value?
+        if (option === null || typeof option === 'undefined') {
+          return '';
+        }
+
+        //Non object? Use its value
+        if (!angular.isObject(option)) {
+          return option;
+        }
+
+        //Must have label property
+        if (!labelBy) {
+          $log.warn('Missing label-by property for type ahead');
+          return '';
+        }
+
+        //Validate property
+        if (typeof option[labelBy] === 'undefined') {
+          $log.warn('Unknown property `' + labelBy + '` for type ahead label');
+          return '';
+        }
+
+        //Return the property
+        return option[labelBy];
+      }
+
+      /**
+       * Find the selected option based on the model value
+       */
+      function findOption(model, options) {
+
+        //Nothing selected or null value selected?
+        if (typeof model === 'undefined' || model === $ctrl.nullValue) {
+          return null;
+        }
+
+        //Tracking by index?
+        if (trackBy === '$index') {
+          if (typeof options[model] !== 'undefined') {
+            return options[model];
+          }
+          return null;
+        }
+
+        //Get the model value
+        var modelValue = getTrackingValue(model, model);
+
+        //Find matching option
+        return options.find(function (option, index) {
+          var optionValue = getTrackingValue(option, index);
+          return modelValue === optionValue;
+        });
+      }
+
+      /**
+       * Do a simple search on object property
+       */
+      function searchOptions(value) {
+        if (!value) {
+          return $q.resolve([]);
+        }
+        var regex = new RegExp('(?:^|\\b)(' + value + ')', 'i');
+        var items = $ctrl.options.filter(function (option) {
+          var label = getLabelValue(option);
+          return regex.test(label);
+        });
+        return $q.resolve(items);
+      }
+
+      /**
+       * Init
+       */
+      this.$onInit = function () {
+
+        //Find some elements
+        $input = $element.find('input');
+        $container = $input.parent().next();
+        $options = $container.find('li');
+
+        //Propagate focus
+        $element.attr('tabindex', -1);
+        $element.on('focus', function () {
+          $input[0].focus();
+        });
+
+        //Apply document click handler
+        //NOTE: applied on body, so that it can prevent global $document handlers
+        $document.find('body').on('click', documentClickHandler);
+
+        //Initialize results and flags
+        this.results = [];
+        this.isSearching = false;
+        this.isShowingResults = false;
+
+        //Empty check override in order for ng-required to work properly
+        this.ngModel.$isEmpty = function () {
+          if ($ctrl.model === null || typeof $ctrl.model === 'undefined') {
+            if (allowNew && $ctrl.searchQuery) {
+              return false;
+            }
+            return true;
+          }
+          return false;
+        };
+      };
+
+      /**
+       * Destroy
+       */
+      this.$onDestroy = function () {
+        $document.find('body').off('click', documentClickHandler);
+      };
+
+      /**
+       * Change handler
+       */
+      this.$onChanges = function (changes) {
+
+        //Validate and mark as dirty if needed
+        if (changes.model) {
+
+          //Only update search query when we have a model
+          //This is to prevent the input from being cleared when we go and edit
+          if (this.model) {
+            var option = void 0;
+            if (angular.isArray(this.options)) {
+              option = findOption(this.model, this.options);
+            } else if (angular.isObject(this.model)) {
+              option = this.model;
+            }
+            if (option) {
+              this.searchQuery = getLabelValue(option);
+            }
+          }
+
+          //Validate model
+          this.ngModel.$validate();
+          if ($formControls.hasChanged(changes.model)) {
+            this.ngModel.$setDirty();
+          }
+        }
+      };
+
+      /**
+       * Get label value of an option
+       */
+      this.getLabel = function (option) {
+        return getLabelValue(option);
+      };
+
+      /**
+       * Key down handler
+       */
+      this.keydown = function (event) {
+
+        //Arrows up/down, move selection
+        if (this.isShowingResults && isControlInput(event)) {
+          if (event.keyCode === KeyCodes.UP) {
+            event.preventDefault();
+            moveSelectionUp();
+          } else if (event.keyCode === KeyCodes.DOWN) {
+            event.preventDefault();
+            moveSelectionDown();
+          } else if (event.keyCode === KeyCodes.ESC) {
+            event.preventDefault();
+            this.hideResults();
+          } else if (event.keyCode === KeyCodes.TAB) {
+            //Don't prevent default
+            this.hideResults();
+          } else if (event.keyCode === KeyCodes.ENTER) {
+            event.preventDefault();
+            this.confirmSelection();
+          }
+        }
+
+        //Show options
+        else if (event.keyCode === KeyCodes.ENTER) {
+            event.preventDefault();
+            this.showResults();
+          }
+      };
+
+      /**
+       * Key up handler
+       */
+      this.keyup = function (event) {
+
+        //If control input, skip further handling
+        if (isControlInput(event)) {
+          return;
+        }
+
+        //Get search query
+        var value = (this.searchQuery || '').trim();
+
+        //Call event handlers
+        this.onQuery({ value: value });
+        this.onChange({ value: null, option: null });
+
+        //Validate and mark as dirty
+        this.ngModel.$validate();
+        this.ngModel.$setDirty();
+
+        //Should we search?
+        if (!this.minLength || value.length >= this.minLength) {
+          this.search(value);
+        } else if (this.hasResults()) {
+          this.clearResults();
+          this.clearSelection();
+        }
+      };
+
+      /**************************************************************************
+       * Search
+       ***/
+
+      /**
+       * Search wrapper
+       */
+      this.search = function (value) {
+        var _this = this;
+
+        //Create new debounced search
+        pendingSearch = $timeout(function () {
+          pendingSearch = null;
+          return _this.doSearch(value);
+        }, debounce);
+
+        //Return the promise
+        return pendingSearch;
+      };
+
+      /**
+       * Actual search handler
+       */
+      this.doSearch = function (value) {
+        var _this2 = this;
+
+        //Determine search handler
+        var search = void 0;
+        if (this.options && angular.isArray(this.options)) {
+          search = searchOptions(value);
+        } else if ($attrs.onSearch) {
+          search = this.onSearch({ value: value });
+        } else {
+          $log.warn('No search handler or options specified');
+          return $q.reject();
+        }
+
+        //Toggle flag
+        this.isSearching = true;
+
+        //Return search promise
+        return search
+
+        //Check if we've gotten an old search back
+        .then(function (results) {
+          if (++currentSearch > lastProcessedSearch) {
+            return results;
+          }
+          return $q.reject('old search');
+        })
+
+        //Process the results
+        .then(function (results) {
+          _this2.clearSelection();
+          _this2.results = results;
+          if (results && results.length > 0) {
+            _this2.isShowingResults = true;
+          }
+        })
+
+        //Done searching
+        .finally(function () {
+          return _this2.isSearching = false;
+        });
+      };
+
+      /**************************************************************************
+       * Results navigation & handling
+       ***/
+
+      /**
+       * Check if we have results
+       */
+      this.hasResults = function () {
+        return this.results && this.results.length > 0;
+      };
+
+      /**
+       * Clear results
+       */
+      this.clearResults = function () {
+        this.results = [];
+        this.isShowingResults = false;
+      };
+
+      /**
+       * Show results
+       */
+      this.showResults = function () {
+        if (this.hasResults()) {
+          this.isShowingResults = true;
+        }
+      };
+
+      /**
+       * Select an option
+       */
+      this.select = function (option) {
+
+        //Ignore when disabled
+        if (this.isDisabled) {
+          return;
+        }
+
+        //Hide options
+        this.hideResults();
+
+        //Get the new model and label values
+        var value = getModelValue(option);
+        var label = getLabelValue(option);
+
+        //Set as search query
+        this.searchQuery = label;
+
+        //Call event handlers
+        this.onQuery({ value: label });
+        this.onChange({ value: value, option: option });
+      };
+
+      /**
+       * Hide results
+       */
+      this.hideResults = function () {
+        this.isShowingResults = false;
+      };
+
+      /**
+       * Set the selection index
+       */
+      this.setSelection = function (index) {
+        selectionIndex = index;
+      };
+
+      /**
+       * Check if given index is the selection index
+       */
+      this.isSelection = function (index) {
+        return selectionIndex === index;
+      };
+
+      /**
+       * Clear selection
+       */
+      this.clearSelection = function () {
+        selectionIndex = undefined;
+      };
+
+      /**
+       * Confirm selection
+       */
+      this.confirmSelection = function (index) {
+
+        //If index not given, use current selection index
+        if (typeof index === 'undefined') {
+          index = selectionIndex;
+        }
+
+        //Validate index
+        if (this.results.length === 0 || typeof this.results[index] === 'undefined') {
+          return;
+        }
+
+        //Select result
+        this.select(this.results[index]);
       };
     }]
   });
