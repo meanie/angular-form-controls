@@ -8,22 +8,22 @@ angular.module('SelectBox.Component', [])
  */
 .component('selectBox', {
   template:
-    `<div class="select-box {{$ctrl.classes}}">
-      <div class="form-control-wrapper clickable" ng-click="$ctrl.toggleOptions()">
-        <span class="form-control-spinner" ng-class="{'show-spinner': $ctrl.hasSpinner}">
-          <span class="caret"
+    `<div class="SelectBox {{$ctrl.classes}}">
+      <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">
+        <span class="Input-Spinner" ng-class="{'Input-Spinner--Visible': $ctrl.hasSpinner}">
+          <span class="Caret"
             ng-click="$ctrl.toggleOptions(); $event.stopPropagation();"
             ng-class="{disabled: $ctrl.isDisabled}"
             ng-if="!$ctrl.hasSpinner"
           ></span>
-          <input readonly class="form-control" type="text"
+          <input readonly class="Input" type="text"
             ng-value="$ctrl.getSelectedLabel()"
             ng-keydown="$ctrl.keydown($event)"
             ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">
           <spinner ng-if="$ctrl.hasSpinner"></spinner>
         </span>
       </div>
-      <ul class="select-box-options" ng-show="$ctrl.isShowingOptions">
+      <ul class="SelectBox-Options" ng-show="$ctrl.isShowingOptions">
         <li
           ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"
           ng-class="{selected: $ctrl.isSelection(-1)}"

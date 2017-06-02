@@ -9,13 +9,13 @@ angular.module('RadioButtons.Component', [])
  */
 .component('radioButtons', {
   template:
-    `<div class="radio-button-group {{$ctrl.classes}}">
-      <label class="radio-button"
+    `<div class="RadioButton-Group {{$ctrl.classes}}">
+      <label class="RadioButton"
         ng-if="$ctrl.isNullable"
         ng-click="$ctrl.select(null)"
         ng-class="{checked: $ctrl.isSelected(null), disabled: $ctrl.isDisabled}"
       >{{$ctrl.nullLabel}}</label>
-      <label class="radio-button"
+      <label class="RadioButton"
         ng-repeat="option in $ctrl.options"
         ng-click="$ctrl.select(option, $index)"
         ng-class="{checked: $ctrl.isSelected(option, $index), disabled: $ctrl.isDisabled}"

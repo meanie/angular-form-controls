@@ -1,15 +1,11 @@
 
-/**
- * Variables
- */
+//Variables
 $radioCheckboxSize: 1.5rem;
 $caretSize: 5px;
 $dropdownItemHeight: 2.25rem;
 
-/**
- * Form controls
- */
-.form-control {
+//Input
+.Input {
 	width: 100%;
 	color: #222;
   height: 2.75rem;
@@ -17,38 +13,30 @@ $dropdownItemHeight: 2.25rem;
   background: #eee;
   border: 1px solid #ddd;
 
-  /**
-   * Select boxes
-   */
+  //Select boxes
   @at-root select#{&} {
     height: 3.2rem;
   }
 
-  /**
-   * Text area
-   */
+  //Text area
   @at-root textarea#{&} {
     height: auto;
     line-height: 1.25rem;
   }
 }
 
-/**
- * Form control wrapper
- */
-.form-control-wrapper {
+//Input wrapper
+.Input-Wrapper {
   position: relative;
-  &.clickable {
-    .form-control:not(.disabled):not([disabled]) {
+  &.is-clickable {
+    .Input:not(.disabled):not([disabled]) {
       cursor: pointer;
     }
   }
 }
 
-/**
- * Radio buttons and check boxes
- */
-.radio-button, .check-box {
+//Radio buttons and check boxes
+.RadioButton, .CheckBox {
   display: block;
   cursor: pointer;
   position: relative;
@@ -90,7 +78,7 @@ $dropdownItemHeight: 2.25rem;
     }
   }
 }
-.check-box {
+.CheckBox {
   &:before {
     border-radius: 0;
   }
@@ -98,7 +86,7 @@ $dropdownItemHeight: 2.25rem;
 
 //This wrapper is needed because the single check box label is wrapper in
 //the <check-box> tag, which breaks first-child determination
-.check-box-wrapper {
+.CheckBox-Wrapper {
   display: block;
   margin-top: .25rem;
   &:first-child {
@@ -106,9 +94,7 @@ $dropdownItemHeight: 2.25rem;
   }
 }
 
-/**
- * Radio button and check box groups
- */
+//Radio button and check box groups
 @mixin checkBoxRadioInGroup {
   @include breakPointMedium {
     display: inline-block;
@@ -119,7 +105,7 @@ $dropdownItemHeight: 2.25rem;
     }
   }
 }
-.radio-button-group {
+.RadioButton-Group {
   display: inline-block;
   &.inline {
     .radio-button {
@@ -127,18 +113,16 @@ $dropdownItemHeight: 2.25rem;
     }
   }
 }
-.check-box-group {
+.CheckBox-Group {
   display: inline-block;
   &.inline {
-    .check-box, .check-box-wrapper {
+    .CheckBox, .CheckBox-Wrapper {
       @include checkBoxRadioInGroup;
     }
   }
 }
 
-/**
- * Dropdown box styling
- */
+//Dropdown box styling
 @mixin dropdownBox {
   position: absolute;
   z-index: 1000;
@@ -154,9 +138,7 @@ $dropdownItemHeight: 2.25rem;
   max-height: ((6 * $dropdownItemHeight) + .5rem);
 }
 
-/**
- * Dropdown box items
- */
+//Dropdown box items
 @mixin dropdownBoxItem {
   cursor: pointer;
   list-style: none;
@@ -185,13 +167,11 @@ $dropdownItemHeight: 2.25rem;
   }
 }
 
-/**
- * Select box/type ahead
- */
-.select-box, .type-ahead {
+//Select box/type ahead
+.SelectBox, .TypeAhead {
   position: relative;
 }
-.select-box-options, .type-ahead-results {
+.SelectBox-Options, .TypeAhead-Results {
   @include dropdownBox;
   min-width: 0; //always match input width
   li {
@@ -199,10 +179,8 @@ $dropdownItemHeight: 2.25rem;
   }
 }
 
-/**
- * Caret
- */
-.caret {
+//Caret
+.Caret {
   display: block;
   position: absolute;
   cursor: pointer;

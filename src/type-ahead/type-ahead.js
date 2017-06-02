@@ -8,10 +8,10 @@ angular.module('TypeAhead.Component', [])
  */
 .component('typeAhead', {
   template:
-    `<div class="type-ahead">
-      <span class="form-control-spinner"
-        ng-class="{'show-spinner': $ctrl.isSearching}">
-        <input class="form-control" type="text"
+    `<div class="TypeAhead">
+      <span class="Input-Spinner"
+        ng-class="{'Input-Spinner--Visible': $ctrl.isSearching}">
+        <input class="Input" type="text"
           placeholder="{{$ctrl.placeholder}}"
           ng-keydown="$ctrl.keydown($event)"
           ng-keyup="$ctrl.keyup($event)"
@@ -19,7 +19,7 @@ angular.module('TypeAhead.Component', [])
           ng-model="$ctrl.searchQuery">
         <spinner></spinner>
       </span>
-      <ul class="type-ahead-results" ng-show="$ctrl.isShowingResults">
+      <ul class="TypeAhead-Results" ng-show="$ctrl.isShowingResults">
         <li
           ng-repeat="item in $ctrl.results"
           ng-class="{selected: $ctrl.isSelection($index)}"
