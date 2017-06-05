@@ -54,7 +54,7 @@
    * Checkbox component
    */
   .component('checkBox', {
-    template: '<label class="CheckBox"\n      ng-transclude\n      ng-click="$ctrl.toggle()"\n      ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"\n    ></label>',
+    template: '<label class="CheckBox"\n      ng-transclude\n      ng-click="$ctrl.toggle($event)"\n      ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"\n    ></label>',
     require: {
       ngModel: 'ngModel'
     },
@@ -80,7 +80,7 @@
       this.$onInit = function () {
 
         //Add checkbox wrapper class to parent component
-        $element.addClass('check-box-wrapper');
+        $element.addClass('CheckBox-Wrapper');
 
         //Empty check override in order for ng-required to work properly
         this.ngModel.$isEmpty = function () {
@@ -108,10 +108,10 @@
       /**
        * Toggle
        */
-      this.toggle = function () {
+      this.toggle = function (event) {
 
-        //Don't toggle when disabled
-        if (this.isDisabled) {
+        //Don't toggle when disabled or event default prevented
+        if (this.isDisabled || event.defaultPrevented) {
           return;
         }
 
@@ -619,7 +619,7 @@
    * Selectbox component
    */
   .component('selectBox', {
-    template: '<div class="SelectBox {{$ctrl.classes}}">\n      <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <span class="Input-Spinner" ng-class="{\'Input-Spinner--Visible\': $ctrl.hasSpinner}">\n          <span class="Caret"\n            ng-click="$ctrl.toggleOptions(); $event.stopPropagation();"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-if="!$ctrl.hasSpinner"\n          ></span>\n          <input readonly class="Input" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </span>\n      </div>\n      <ul class="SelectBox-Options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1)"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
+    template: '<div class="SelectBox {{$ctrl.classes}}">\n      <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <span class="Input-Spinner" ng-class="{\'Input-Spinner--Visible\': $ctrl.hasSpinner}">\n          <span class="Caret"\n            ng-click="$ctrl.toggleOptions(); $event.stopImmediatePropagation();"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-if="!$ctrl.hasSpinner"\n          ></span>\n          <input readonly class="Input" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </span>\n      </div>\n      <ul class="SelectBox-Options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
