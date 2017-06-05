@@ -11,7 +11,7 @@ angular.module('CheckBox.Component', [])
   template:
     `<label class="CheckBox"
       ng-transclude
-      ng-click="$ctrl.toggle()"
+      ng-click="$ctrl.toggle($event)"
       ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"
     ></label>`,
   require: {
@@ -39,7 +39,7 @@ angular.module('CheckBox.Component', [])
     this.$onInit = function() {
 
       //Add checkbox wrapper class to parent component
-      $element.addClass('check-box-wrapper');
+      $element.addClass('CheckBox-Wrapper');
 
       //Empty check override in order for ng-required to work properly
       this.ngModel.$isEmpty = function() {
@@ -67,10 +67,10 @@ angular.module('CheckBox.Component', [])
     /**
      * Toggle
      */
-    this.toggle = function() {
+    this.toggle = function(event) {
 
-      //Don't toggle when disabled
-      if (this.isDisabled) {
+      //Don't toggle when disabled or event default prevented
+      if (this.isDisabled || event.defaultPrevented) {
         return;
       }
 

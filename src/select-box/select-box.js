@@ -12,7 +12,7 @@ angular.module('SelectBox.Component', [])
       <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">
         <span class="Input-Spinner" ng-class="{'Input-Spinner--Visible': $ctrl.hasSpinner}">
           <span class="Caret"
-            ng-click="$ctrl.toggleOptions(); $event.stopPropagation();"
+            ng-click="$ctrl.toggleOptions(); $event.stopImmediatePropagation();"
             ng-class="{disabled: $ctrl.isDisabled}"
             ng-if="!$ctrl.hasSpinner"
           ></span>
