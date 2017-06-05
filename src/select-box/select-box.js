@@ -28,14 +28,14 @@ angular.module('SelectBox.Component', [])
           ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"
           ng-class="{selected: $ctrl.isSelection(-1)}"
           ng-mouseover="$ctrl.setSelection(-1)"
-          ng-click="$ctrl.confirmSelection(-1)"
+          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"
         >{{$ctrl.nullLabel}}</li>
         <li
           ng-transclude
           ng-repeat="option in $ctrl.options"
           ng-class="{selected: $ctrl.isSelection($index)}"
           ng-mouseover="$ctrl.setSelection($index)"
-          ng-click="$ctrl.confirmSelection($index)"
+          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"
         >{{$ctrl.getLabel(option)}}</li>
       </ul>
     </div>`,
