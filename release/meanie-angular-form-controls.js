@@ -11,43 +11,6 @@
    * Module definition and dependencies
    */
 
-  angular.module('FormControls.Component', ['CheckBox.Component', 'CheckBoxes.Component', 'RadioButtons.Component', 'SelectBox.Component', 'TypeAhead.Component'])
-
-  /**
-   * Helper service
-   */
-  .factory('$formControls', function () {
-    return {
-
-      /**
-       * Check if an item value really changed (deep checking with angular.equals)
-       */
-
-      hasChanged: function hasChanged(changes) {
-
-        //Get previous and current value
-        var previousValue = changes.previousValue;
-        var currentValue = changes.currentValue;
-
-        //If unitialized, don't trigger changes
-
-        if (previousValue === 'UNINITIALIZED_VALUE') {
-          return false;
-        }
-
-        //Check if equals
-        return !angular.equals(previousValue, currentValue);
-      }
-    };
-  });
-})(window, window.angular);
-(function (window, angular, undefined) {
-  'use strict';
-
-  /**
-   * Module definition and dependencies
-   */
-
   angular.module('CheckBox.Component', [])
 
   /**
@@ -378,6 +341,43 @@
    * Module definition and dependencies
    */
 
+  angular.module('FormControls.Component', ['CheckBox.Component', 'CheckBoxes.Component', 'RadioButtons.Component', 'SelectBox.Component', 'TypeAhead.Component'])
+
+  /**
+   * Helper service
+   */
+  .factory('$formControls', function () {
+    return {
+
+      /**
+       * Check if an item value really changed (deep checking with angular.equals)
+       */
+
+      hasChanged: function hasChanged(changes) {
+
+        //Get previous and current value
+        var previousValue = changes.previousValue;
+        var currentValue = changes.currentValue;
+
+        //If unitialized, don't trigger changes
+
+        if (previousValue === 'UNINITIALIZED_VALUE') {
+          return false;
+        }
+
+        //Check if equals
+        return !angular.equals(previousValue, currentValue);
+      }
+    };
+  });
+})(window, window.angular);
+(function (window, angular, undefined) {
+  'use strict';
+
+  /**
+   * Module definition and dependencies
+   */
+
   angular.module('RadioButtons.Component', [])
 
   /**
@@ -609,6 +609,7 @@
 })(window, window.angular);
 (function (window, angular, undefined) {
   'use strict';
+
   /**
    * Module definition and dependencies
    */
@@ -619,7 +620,7 @@
    * Selectbox component
    */
   .component('selectBox', {
-    template: '<div class="SelectBox {{$ctrl.classes}}">\n      <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <span class="Input-Spinner" ng-class="{\'Input-Spinner--Visible\': $ctrl.hasSpinner}">\n          <span class="Caret"\n            ng-click="$ctrl.toggleOptions(); $event.stopImmediatePropagation();"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-if="!$ctrl.hasSpinner"\n          ></span>\n          <input readonly class="Input" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </span>\n      </div>\n      <ul class="SelectBox-Options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
+    template: '<div class="SelectBox {{$ctrl.classes}}">\n      <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <div class="Input-Spinner" ng-class="{\'Input-Spinner--Visible\': $ctrl.hasSpinner}">\n          <div class="Caret"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-click="$event.stopPropagation()"\n            ng-if="!$ctrl.hasSpinner"\n          ></div>\n          <input readonly class="Input" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </div>\n      </div>\n      <ul class="SelectBox-Options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
@@ -712,7 +713,9 @@
        * Click handler for document
        */
       function documentClickHandler(event) {
-        if (!$input[0].contains(event.target) && $ctrl.isShowingOptions) {
+        console.log('document click handler');
+        if ($ctrl.isShowingOptions && !$element[0].contains(event.target)) {
+          console.log('hiding!');
           $scope.$apply($ctrl.hideOptions.bind($ctrl));
           event.preventDefault();
           event.stopPropagation();
@@ -985,7 +988,7 @@
         $input = $element.find('input');
         $container = $input.parent().parent().next();
 
-        //Apply document click handler
+        //Apply global click handler
         //NOTE: applied on body, so that it can prevent global $document handlers
         $document.find('body').on('click', documentClickHandler);
 
@@ -1133,6 +1136,7 @@
        * Toggle options
        */
       this.toggleOptions = function () {
+        console.log('TOGGLE!');
         if (this.isShowingOptions) {
           this.hideOptions();
         } else {
