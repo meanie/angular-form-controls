@@ -1,3 +1,4 @@
+
 /**
  * Module definition and dependencies
  */
@@ -10,18 +11,18 @@ angular.module('SelectBox.Component', [])
   template:
     `<div class="SelectBox {{$ctrl.classes}}">
       <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">
-        <span class="Input-Spinner" ng-class="{'Input-Spinner--Visible': $ctrl.hasSpinner}">
-          <span class="Caret"
-            ng-click="$ctrl.toggleOptions(); $event.stopImmediatePropagation();"
+        <div class="Input-Spinner" ng-class="{'Input-Spinner--Visible': $ctrl.hasSpinner}">
+          <div class="Caret"
             ng-class="{disabled: $ctrl.isDisabled}"
+            ng-click="$event.stopPropagation()"
             ng-if="!$ctrl.hasSpinner"
-          ></span>
+          ></div>
           <input readonly class="Input" type="text"
             ng-value="$ctrl.getSelectedLabel()"
             ng-keydown="$ctrl.keydown($event)"
             ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">
           <spinner ng-if="$ctrl.hasSpinner"></spinner>
-        </span>
+        </div>
       </div>
       <ul class="SelectBox-Options" ng-show="$ctrl.isShowingOptions">
         <li
@@ -129,7 +130,9 @@ angular.module('SelectBox.Component', [])
      * Click handler for document
      */
     function documentClickHandler(event) {
-      if (!$input[0].contains(event.target) && $ctrl.isShowingOptions) {
+      console.log('document click handler');
+      if ($ctrl.isShowingOptions && !$element[0].contains(event.target)) {
+        console.log('hiding!');
         $scope.$apply($ctrl.hideOptions.bind($ctrl));
         event.preventDefault();
         event.stopPropagation();
@@ -408,7 +411,7 @@ angular.module('SelectBox.Component', [])
       $input = $element.find('input');
       $container = $input.parent().parent().next();
 
-      //Apply document click handler
+      //Apply global click handler
       //NOTE: applied on body, so that it can prevent global $document handlers
       $document.find('body').on('click', documentClickHandler);
 
@@ -559,6 +562,7 @@ angular.module('SelectBox.Component', [])
      * Toggle options
      */
     this.toggleOptions = function() {
+      console.log('TOGGLE!');
       if (this.isShowingOptions) {
         this.hideOptions();
       }
