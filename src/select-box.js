@@ -130,9 +130,7 @@ angular.module('SelectBox.Component', [])
      * Click handler for document
      */
     function documentClickHandler(event) {
-      console.log('document click handler');
       if ($ctrl.isShowingOptions && !$element[0].contains(event.target)) {
-        console.log('hiding!');
         $scope.$apply($ctrl.hideOptions.bind($ctrl));
         event.preventDefault();
         event.stopPropagation();
@@ -562,7 +560,6 @@ angular.module('SelectBox.Component', [])
      * Toggle options
      */
     this.toggleOptions = function() {
-      console.log('TOGGLE!');
       if (this.isShowingOptions) {
         this.hideOptions();
       }
