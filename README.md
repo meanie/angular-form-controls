@@ -1,6 +1,6 @@
-# meanie-angular-form-controls
+# @meanie/angular-form-controls
 
-[![npm version](https://img.shields.io/npm/v/meanie-angular-form-controls.svg)](https://www.npmjs.com/package/meanie-angular-form-controls)
+[![npm version](https://img.shields.io/npm/v/@meanie/angular-form-controls.svg)](https://www.npmjs.com/package/@meanie/angular-form-controls)
 [![node dependencies](https://david-dm.org/meanie/angular-form-controls.svg)](https://david-dm.org/meanie/angular-form-controls)
 [![github issues](https://img.shields.io/github/issues/meanie/angular-form-controls.svg)](https://github.com/meanie/angular-form-controls/issues)
 [![codacy](https://img.shields.io/codacy/94eeaafada4e4e7ebc9f1689f151c4e7.svg)](https://www.codacy.com/app/meanie/angular-form-controls)
@@ -12,16 +12,20 @@ A set of form control components for Angular 1 (select box, check boxes, radio b
 
 ## Installation
 
-You can install this package using `npm`:
+You can install this package using `yarn` or `npm`:
 
 ```shell
-npm install meanie-angular-form-controls --save
+#yarn
+yarn add @meanie/angular-form-controls
+
+#npm
+npm install @meanie/angular-form-controls --save
 ```
 
-Include the script `node_modules/meanie-angular-form-controls/release/meanie-angular-form-controls.js` in your build process, or add it via a `<script>` tag to your `index.html`:
+Include the script `node_modules/@meanie/angular-form-controls/release/angular-form-controls.js` in your build process, or add it via a `<script>` tag to your `index.html`:
 
 ```html
-<script src="node_modules/meanie-angular-form-controls/release/meanie-angular-form-controls.js"></script>
+<script src="node_modules/@meanie/angular-form-controls/release/angular-form-controls.js"></script>
 ```
 
 Add `FormControls.Component` as a dependency for your app.
@@ -379,7 +383,7 @@ Required:
 
 ## Issues & feature requests
 
-Please report any bugs, issues, suggestions and feature requests in the [meanie-angular-form-controls issue tracker](https://github.com/meanie/angular-form-controls/issues).
+Please report any bugs, issues, suggestions and feature requests in the [@meanie/angular-form-controls issue tracker](https://github.com/meanie/angular-form-controls/issues).
 
 ## Contributing
 
@@ -392,4 +396,4 @@ Pull requests are welcome! If you would like to contribute to Meanie, please che
 ## License
 (MIT License)
 
-Copyright 2015-2017, [Adam Reis](http://adam.reis.nz)
+Copyright 2015-2017, [Adam Reis](https://adam.reis.nz)

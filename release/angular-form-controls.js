@@ -1,5 +1,5 @@
 /**
- * meanie-angular-form-controls * https://github.com/meanie/angular-form-controls
+ * @meanie/angular-form-controls * https://github.com/meanie/angular-form-controls
  *
  * Copyright (c) 2017 Adam Reis <adam@reis.nz>
  * License: MIT
@@ -352,12 +352,11 @@
       /**
        * Check if an item value really changed (deep checking with angular.equals)
        */
-
       hasChanged: function hasChanged(changes) {
 
         //Get previous and current value
-        var previousValue = changes.previousValue;
-        var currentValue = changes.currentValue;
+        var previousValue = changes.previousValue,
+            currentValue = changes.currentValue;
 
         //If unitialized, don't trigger changes
 
