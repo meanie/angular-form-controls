@@ -45,6 +45,14 @@
         //Add checkbox wrapper class to parent component
         $element.addClass('CheckBoxWrapper');
 
+        //Find label
+        var $label = $element.find('label');
+
+        //Propagate focus
+        $element.on('focus', function () {
+          $label[0].focus();
+        });
+
         //Empty check override in order for ng-required to work properly
         this.ngModel.$isEmpty = function () {
           if ($ctrl.isInverse) {
@@ -619,7 +627,7 @@
    * Selectbox component
    */
   .component('selectBox', {
-    template: '<div class="SelectBox {{$ctrl.classes}}">\n      <div class="InputWrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <div class="InputSpinner" ng-class="{\'InputSpinner--Visible\': $ctrl.hasSpinner}">\n          <div class="Caret"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-click="$event.stopPropagation()"\n            ng-if="!$ctrl.hasSpinner"\n          ></div>\n          <input readonly class="Input" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </div>\n      </div>\n      <ul class="SelectBox-options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
+    template: '<div class="SelectBox {{$ctrl.selectBoxClass}}">\n      <div class="InputWrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <div class="InputSpinner" ng-class="{\'InputSpinner--Visible\': $ctrl.hasSpinner}">\n          <div class="Caret"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-click="$event.stopPropagation()"\n            ng-if="!$ctrl.hasSpinner"\n          ></div>\n          <input readonly class="Input {{$ctrl.inputClass}}" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </div>\n      </div>\n      <ul class="SelectBox-options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
@@ -631,6 +639,7 @@
       isNullable: '<',
       nullValue: '<',
       nullLabel: '<',
+      inputClass: '<',
       isDisabled: '<ngDisabled',
       hasSpinner: '<hasSpinner'
     },
@@ -978,7 +987,7 @@
         this.isShowingOptions = false;
 
         //Propagate classes
-        this.classes = $element[0].className;
+        this.selectBoxClass = $element[0].className;
         $element[0].className = '';
 
         //Find some elements
@@ -1263,13 +1272,14 @@
    * Type ahead component
    */
   .component('typeAhead', {
-    template: '<div class="TypeAhead">\n      <span class="InputSpinner"\n        ng-class="{\'InputSpinner--Visible\': $ctrl.isSearching}">\n        <input class="Input" type="text"\n          placeholder="{{$ctrl.placeholder}}"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-keyup="$ctrl.keyup($event)"\n          ng-disabled="$ctrl.isDisabled"\n          ng-model="$ctrl.searchQuery">\n        <spinner></spinner>\n      </span>\n      <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
+    template: '<div class="TypeAhead {{$ctrl.typeAheadClass}}">\n      <span class="InputSpinner"\n        ng-class="{\'InputSpinner--Visible\': $ctrl.isSearching}">\n        <input class="Input {{$ctrl.inputClass}}" type="text"\n          placeholder="{{$ctrl.placeholder}}"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-keyup="$ctrl.keyup($event)"\n          ng-disabled="$ctrl.isDisabled"\n          ng-model="$ctrl.searchQuery">\n        <spinner></spinner>\n      </span>\n      <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
     },
     bindings: {
       model: '<ngModel',
+      inputClass: '<',
       options: '<',
       placeholder: '@',
       onSearch: '&',
@@ -1531,6 +1541,10 @@
         $element.on('focus', function () {
           $input[0].focus();
         });
+
+        //Propagate classes
+        this.typeAheadClass = $element[0].className;
+        $element[0].className = '';
 
         //Apply document click handler
         //NOTE: applied on body, so that it can prevent global $document handlers
