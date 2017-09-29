@@ -26,7 +26,7 @@ $dropdownItemHeight: 2.25rem;
 }
 
 //Input wrapper
-.Input-Wrapper {
+.InputWrapper {
   position: relative;
   &.is-clickable {
     .Input:not(.disabled):not([disabled]) {
@@ -86,7 +86,7 @@ $dropdownItemHeight: 2.25rem;
 
 //This wrapper is needed because the single check box label is wrapper in
 //the <check-box> tag, which breaks first-child determination
-.CheckBox-Wrapper {
+.CheckBoxWrapper {
   display: block;
   margin-top: .25rem;
   &:first-child {
@@ -105,7 +105,7 @@ $dropdownItemHeight: 2.25rem;
     }
   }
 }
-.RadioButton-Group {
+.RadioButtonGroup {
   display: inline-block;
   &.inline {
     .radio-button {
@@ -113,10 +113,10 @@ $dropdownItemHeight: 2.25rem;
     }
   }
 }
-.CheckBox-Group {
+.CheckBoxGroup {
   display: inline-block;
   &.inline {
-    .CheckBox, .CheckBox-Wrapper {
+    .CheckBox, .CheckBoxWrapper {
       @include checkBoxRadioInGroup;
     }
   }
@@ -171,7 +171,7 @@ $dropdownItemHeight: 2.25rem;
 .SelectBox, .TypeAhead {
   position: relative;
 }
-.SelectBox-Options, .TypeAhead-Results {
+.SelectBox-options, .TypeAhead-results {
   @include dropdownBox;
   min-width: 0; //always match input width
   li {

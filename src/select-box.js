@@ -9,22 +9,22 @@ angular.module('SelectBox.Component', [])
  */
 .component('selectBox', {
   template:
-    `<div class="SelectBox {{$ctrl.classes}}">
-      <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">
-        <div class="Input-Spinner" ng-class="{'Input-Spinner--Visible': $ctrl.hasSpinner}">
+    `<div class="SelectBox {{$ctrl.selectBoxClass}}">
+      <div class="InputWrapper is-clickable" ng-click="$ctrl.toggleOptions()">
+        <div class="InputSpinner" ng-class="{'InputSpinner--Visible': $ctrl.hasSpinner}">
           <div class="Caret"
             ng-class="{disabled: $ctrl.isDisabled}"
             ng-click="$event.stopPropagation()"
             ng-if="!$ctrl.hasSpinner"
           ></div>
-          <input readonly class="Input" type="text"
+          <input readonly class="Input {{$ctrl.inputClass}}" type="text"
             ng-value="$ctrl.getSelectedLabel()"
             ng-keydown="$ctrl.keydown($event)"
             ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">
           <spinner ng-if="$ctrl.hasSpinner"></spinner>
         </div>
       </div>
-      <ul class="SelectBox-Options" ng-show="$ctrl.isShowingOptions">
+      <ul class="SelectBox-options" ng-show="$ctrl.isShowingOptions">
         <li
           ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"
           ng-class="{selected: $ctrl.isSelection(-1)}"
@@ -51,6 +51,7 @@ angular.module('SelectBox.Component', [])
     isNullable: '<',
     nullValue: '<',
     nullLabel: '<',
+    inputClass: '<',
     isDisabled: '<ngDisabled',
     hasSpinner: '<hasSpinner',
   },
@@ -402,7 +403,7 @@ angular.module('SelectBox.Component', [])
       this.isShowingOptions = false;
 
       //Propagate classes
-      this.classes = $element[0].className;
+      this.selectBoxClass = $element[0].className;
       $element[0].className = '';
 
       //Find some elements

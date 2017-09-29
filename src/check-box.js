@@ -39,7 +39,7 @@ angular.module('CheckBox.Component', [])
     this.$onInit = function() {
 
       //Add checkbox wrapper class to parent component
-      $element.addClass('CheckBox-Wrapper');
+      $element.addClass('CheckBoxWrapper');
 
       //Find label
       const $label = $element.find('label');
