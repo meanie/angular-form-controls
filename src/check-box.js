@@ -41,6 +41,14 @@ angular.module('CheckBox.Component', [])
       //Add checkbox wrapper class to parent component
       $element.addClass('CheckBox-Wrapper');
 
+      //Find label
+      const $label = $element.find('label');
+
+      //Propagate focus
+      $element.on('focus', () => {
+        $label[0].focus();
+      });
+
       //Empty check override in order for ng-required to work properly
       this.ngModel.$isEmpty = function() {
         if ($ctrl.isInverse) {
