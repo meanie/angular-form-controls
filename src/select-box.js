@@ -11,18 +11,16 @@ angular.module('SelectBox.Component', [])
   template:
     `<div class="SelectBox {{$ctrl.selectBoxClass}}">
       <div class="InputWrapper is-clickable" ng-click="$ctrl.toggleOptions()">
-        <div class="InputSpinner" ng-class="{'InputSpinner--Visible': $ctrl.hasSpinner}">
-          <div class="Caret"
-            ng-class="{disabled: $ctrl.isDisabled}"
-            ng-click="$event.stopPropagation()"
-            ng-if="!$ctrl.hasSpinner"
-          ></div>
-          <input readonly class="Input {{$ctrl.inputClass}}" type="text"
-            ng-value="$ctrl.getSelectedLabel()"
-            ng-keydown="$ctrl.keydown($event)"
-            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">
-          <spinner ng-if="$ctrl.hasSpinner"></spinner>
-        </div>
+        <div class="Caret"
+          ng-class="{disabled: $ctrl.isDisabled}"
+          ng-click="$event.stopPropagation()"
+          ng-if="!$ctrl.hasSpinner"
+        ></div>
+        <input readonly class="Input {{$ctrl.inputClass}}" type="text"
+          ng-value="$ctrl.getSelectedLabel()"
+          ng-keydown="$ctrl.keydown($event)"
+          ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">
+        <spinner class="Spinner--input" ng-if="$ctrl.hasSpinner"></spinner>
       </div>
       <ul class="SelectBox-options" ng-show="$ctrl.isShowingOptions">
         <li
