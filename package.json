@@ -1,6 +1,6 @@
 {
   "name": "@meanie/angular-form-controls",
-  "description": "A set of form control components for Angular 1 (select box, check boxes, radio buttons)",
+  "description": "A set of form control components for Angular 1 (select box, type ahead, check boxes, radio buttons)",
   "version": "3.0.1",
   "homepage": "https://github.com/meanie/angular-form-controls",
   "author": {
@@ -36,7 +36,8 @@
     "check box",
     "check boxes",
     "radio",
-    "radio button"
+    "radio button",
+    "type ahead"
   ],
   "main": "index.js",
   "scripts": {
