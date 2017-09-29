@@ -9,7 +9,7 @@ angular.module('CheckBoxes.Component', [])
  */
 .component('checkBoxes', {
   template:
-    `<div class="CheckBox-Group {{$ctrl.classes}}">
+    `<div class="CheckBoxGroup {{$ctrl.classes}}">
       <label class="CheckBox"
         ng-repeat="option in $ctrl.options"
         ng-click="$ctrl.toggle(option, $index)"

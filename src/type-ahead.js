@@ -8,10 +8,10 @@ angular.module('TypeAhead.Component', [])
  */
 .component('typeAhead', {
   template:
-    `<div class="TypeAhead">
-      <span class="Input-Spinner"
-        ng-class="{'Input-Spinner--Visible': $ctrl.isSearching}">
-        <input class="Input" type="text"
+    `<div class="TypeAhead {{$ctrl.typeAheadClass}}">
+      <span class="InputSpinner"
+        ng-class="{'InputSpinner--Visible': $ctrl.isSearching}">
+        <input class="Input {{$ctrl.inputClass}}" type="text"
           placeholder="{{$ctrl.placeholder}}"
           ng-keydown="$ctrl.keydown($event)"
           ng-keyup="$ctrl.keyup($event)"
@@ -19,7 +19,7 @@ angular.module('TypeAhead.Component', [])
           ng-model="$ctrl.searchQuery">
         <spinner></spinner>
       </span>
-      <ul class="TypeAhead-Results" ng-show="$ctrl.isShowingResults">
+      <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">
         <li
           ng-repeat="item in $ctrl.results"
           ng-class="{selected: $ctrl.isSelection($index)}"
@@ -37,6 +37,7 @@ angular.module('TypeAhead.Component', [])
   },
   bindings: {
     model: '<ngModel',
+    inputClass: '<',
     options: '<',
     placeholder: '@',
     onSearch: '&',
@@ -307,6 +308,10 @@ angular.module('TypeAhead.Component', [])
       $element.on('focus', () => {
         $input[0].focus();
       });
+
+      //Propagate classes
+      this.typeAheadClass = $element[0].className;
+      $element[0].className = '';
 
       //Apply document click handler
       //NOTE: applied on body, so that it can prevent global $document handlers

@@ -43,7 +43,7 @@
       this.$onInit = function () {
 
         //Add checkbox wrapper class to parent component
-        $element.addClass('CheckBox-Wrapper');
+        $element.addClass('CheckBoxWrapper');
 
         //Empty check override in order for ng-required to work properly
         this.ngModel.$isEmpty = function () {
@@ -105,7 +105,7 @@
    * Checkboxes component
    */
   .component('checkBoxes', {
-    template: '<div class="CheckBox-Group {{$ctrl.classes}}">\n      <label class="CheckBox"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.toggle(option, $index)"\n        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
+    template: '<div class="CheckBoxGroup {{$ctrl.classes}}">\n      <label class="CheckBox"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.toggle(option, $index)"\n        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
     require: {
       ngModel: 'ngModel'
     },
@@ -384,7 +384,7 @@
    * Radio buttons component
    */
   .component('radioButtons', {
-    template: '<div class="RadioButton-Group {{$ctrl.classes}}">\n      <label class="RadioButton"\n        ng-if="$ctrl.isNullable"\n        ng-click="$ctrl.select(null)"\n        ng-class="{checked: $ctrl.isSelected(null), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.nullLabel}}</label>\n      <label class="RadioButton"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.select(option, $index)"\n        ng-class="{checked: $ctrl.isSelected(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
+    template: '<div class="RadioButtonGroup {{$ctrl.classes}}">\n      <label class="RadioButton"\n        ng-if="$ctrl.isNullable"\n        ng-click="$ctrl.select(null)"\n        ng-class="{checked: $ctrl.isSelected(null), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.nullLabel}}</label>\n      <label class="RadioButton"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.select(option, $index)"\n        ng-class="{checked: $ctrl.isSelected(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
     require: {
       ngModel: 'ngModel'
     },
@@ -620,7 +620,7 @@
    * Selectbox component
    */
   .component('selectBox', {
-    template: '<div class="SelectBox {{$ctrl.classes}}">\n      <div class="Input-Wrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <div class="Input-Spinner" ng-class="{\'Input-Spinner--Visible\': $ctrl.hasSpinner}">\n          <div class="Caret"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-click="$event.stopPropagation()"\n            ng-if="!$ctrl.hasSpinner"\n          ></div>\n          <input readonly class="Input" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </div>\n      </div>\n      <ul class="SelectBox-Options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
+    template: '<div class="SelectBox {{$ctrl.classes}}">\n      <div class="InputWrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <div class="InputSpinner" ng-class="{\'InputSpinner--Visible\': $ctrl.hasSpinner}">\n          <div class="Caret"\n            ng-class="{disabled: $ctrl.isDisabled}"\n            ng-click="$event.stopPropagation()"\n            ng-if="!$ctrl.hasSpinner"\n          ></div>\n          <input readonly class="Input" type="text"\n            ng-value="$ctrl.getSelectedLabel()"\n            ng-keydown="$ctrl.keydown($event)"\n            ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n          <spinner ng-if="$ctrl.hasSpinner"></spinner>\n        </div>\n      </div>\n      <ul class="SelectBox-options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
@@ -1264,7 +1264,7 @@
    * Type ahead component
    */
   .component('typeAhead', {
-    template: '<div class="TypeAhead">\n      <span class="Input-Spinner"\n        ng-class="{\'Input-Spinner--Visible\': $ctrl.isSearching}">\n        <input class="Input" type="text"\n          placeholder="{{$ctrl.placeholder}}"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-keyup="$ctrl.keyup($event)"\n          ng-disabled="$ctrl.isDisabled"\n          ng-model="$ctrl.searchQuery">\n        <spinner></spinner>\n      </span>\n      <ul class="TypeAhead-Results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
+    template: '<div class="TypeAhead">\n      <span class="InputSpinner"\n        ng-class="{\'InputSpinner--Visible\': $ctrl.isSearching}">\n        <input class="Input" type="text"\n          placeholder="{{$ctrl.placeholder}}"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-keyup="$ctrl.keyup($event)"\n          ng-disabled="$ctrl.isDisabled"\n          ng-model="$ctrl.searchQuery">\n        <spinner></spinner>\n      </span>\n      <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
