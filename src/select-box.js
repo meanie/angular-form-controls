@@ -406,7 +406,7 @@ angular.module('SelectBox.Component', [])
 
       //Find some elements
       $input = $element.find('input');
-      $container = $input.parent().parent().next();
+      $container = $input.parent().next();
 
       //Apply global click handler
       //NOTE: applied on body, so that it can prevent global $document handlers
