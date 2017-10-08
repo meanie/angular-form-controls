@@ -360,11 +360,12 @@
       /**
        * Check if an item value really changed (deep checking with angular.equals)
        */
+
       hasChanged: function hasChanged(changes) {
 
         //Get previous and current value
-        var previousValue = changes.previousValue,
-            currentValue = changes.currentValue;
+        var previousValue = changes.previousValue;
+        var currentValue = changes.currentValue;
 
         //If unitialized, don't trigger changes
 
@@ -992,7 +993,7 @@
 
         //Find some elements
         $input = $element.find('input');
-        $container = $input.parent().parent().next();
+        $container = $input.parent().next();
 
         //Apply global click handler
         //NOTE: applied on body, so that it can prevent global $document handlers
@@ -1533,7 +1534,7 @@
 
         //Find some elements
         $input = $element.find('input');
-        $container = $input.parent().next();
+        $container = $input.next().next();
         $options = $container.find('li');
 
         //Propagate focus
