@@ -29,6 +29,7 @@ angular.module('TypeAhead.Component', [])
       </ul>
     </div>`,
   transclude: true,
+
   require: {
     ngModel: 'ngModel',
   },
