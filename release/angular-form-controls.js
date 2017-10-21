@@ -360,12 +360,11 @@
       /**
        * Check if an item value really changed (deep checking with angular.equals)
        */
-
       hasChanged: function hasChanged(changes) {
 
         //Get previous and current value
-        var previousValue = changes.previousValue;
-        var currentValue = changes.currentValue;
+        var previousValue = changes.previousValue,
+            currentValue = changes.currentValue;
 
         //If unitialized, don't trigger changes
 
@@ -640,7 +639,7 @@
       isNullable: '<',
       nullValue: '<',
       nullLabel: '<',
-      inputClass: '<',
+      inputClass: '@',
       isDisabled: '<ngDisabled',
       hasSpinner: '<hasSpinner'
     },
@@ -1275,12 +1274,13 @@
   .component('typeAhead', {
     template: '<div class="TypeAhead {{$ctrl.typeAheadClass}}">\n      <input class="Input {{$ctrl.inputClass}}" type="text"\n        placeholder="{{$ctrl.placeholder}}"\n        ng-keydown="$ctrl.keydown($event)"\n        ng-keyup="$ctrl.keyup($event)"\n        ng-disabled="$ctrl.isDisabled"\n        ng-model="$ctrl.searchQuery">\n      <spinner class="Spinner--input"></spinner>\n      <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
     transclude: true,
+
     require: {
       ngModel: 'ngModel'
     },
     bindings: {
       model: '<ngModel',
-      inputClass: '<',
+      inputClass: '@',
       options: '<',
       placeholder: '@',
       onSearch: '&',
