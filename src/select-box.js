@@ -49,7 +49,7 @@ angular.module('SelectBox.Component', [])
     isNullable: '<',
     nullValue: '<',
     nullLabel: '<',
-    inputClass: '<',
+    inputClass: '@',
     isDisabled: '<ngDisabled',
     hasSpinner: '<hasSpinner',
   },

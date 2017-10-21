@@ -34,7 +34,7 @@ angular.module('TypeAhead.Component', [])
   },
   bindings: {
     model: '<ngModel',
-    inputClass: '<',
+    inputClass: '@',
     options: '<',
     placeholder: '@',
     onSearch: '&',
