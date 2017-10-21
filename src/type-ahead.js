@@ -29,6 +29,7 @@ angular.module('TypeAhead.Component', [])
       </ul>
     </div>`,
   transclude: true,
+
   require: {
     ngModel: 'ngModel',
   },
@@ -297,7 +298,7 @@ angular.module('TypeAhead.Component', [])
 
       //Find some elements
       $input = $element.find('input');
-      $container = $input.parent().next();
+      $container = $input.next().next();
       $options = $container.find('li');
 
       //Propagate focus
