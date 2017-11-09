@@ -277,7 +277,11 @@
 
         //Must have array as options
         if (!angular.isArray(this.options)) {
-          this.options = [];
+          if (typeof this.options === 'string') {
+            this.options = this.options.split('\n');
+          } else {
+            this.options = [];
+          }
         }
 
         //Validate and mark as dirty if needed
@@ -556,7 +560,11 @@
 
         //Must have array as options
         if (!angular.isArray(this.options)) {
-          this.options = [];
+          if (typeof this.options === 'string') {
+            this.options = this.options.split('\n');
+          } else {
+            this.options = [];
+          }
         }
 
         //Set default null value/label if not set
@@ -1021,7 +1029,11 @@
 
         //Must have array as options
         if (!angular.isArray(this.options)) {
-          this.options = [];
+          if (typeof this.options === 'string') {
+            this.options = this.options.split('\n');
+          } else {
+            this.options = [];
+          }
         }
 
         //Set default null value/label if not set
