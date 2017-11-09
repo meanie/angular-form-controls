@@ -180,7 +180,12 @@ angular.module('CheckBoxes.Component', [])
 
       //Must have array as options
       if (!angular.isArray(this.options)) {
-        this.options = [];
+        if (typeof this.options === 'string') {
+          this.options = this.options.split('\n');
+        }
+        else {
+          this.options = [];
+        }
       }
 
       //Validate and mark as dirty if needed
