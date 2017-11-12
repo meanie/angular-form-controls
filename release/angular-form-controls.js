@@ -549,7 +549,7 @@
           if ($ctrl.isNullable) {
             return $ctrl.model === $ctrl.nullValue;
           }
-          return $ctrl.model === null || typeof $ctrl.model === 'undefined';
+          return $ctrl.model === null || $ctrl.model === $ctrl.nullValue || typeof $ctrl.model === 'undefined';
         };
       };
 
@@ -1011,7 +1011,7 @@
           if ($ctrl.isNullable) {
             return $ctrl.model === $ctrl.nullValue;
           }
-          return $ctrl.model === null || typeof $ctrl.model === 'undefined';
+          return $ctrl.model === null || $ctrl.model === $ctrl.nullValue || typeof $ctrl.model === 'undefined';
         };
       };
 
