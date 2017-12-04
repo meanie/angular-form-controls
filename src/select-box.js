@@ -553,6 +553,7 @@ angular.module('SelectBox.Component', [])
         this.isShowingOptions = true;
         $timeout(() => {
           ensureDropdownInView();
+          ensureSelectionInView();
         });
       }
     };
