@@ -1139,6 +1139,7 @@
           this.isShowingOptions = true;
           $timeout(function () {
             ensureDropdownInView();
+            ensureSelectionInView();
           });
         }
       };
