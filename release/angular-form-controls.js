@@ -1,7 +1,7 @@
 /**
  * @meanie/angular-form-controls * https://github.com/meanie/angular-form-controls
  *
- * Copyright (c) 2017 Adam Reis <adam@reis.nz>
+ * Copyright (c) 2018 Adam Reis <adam@reis.nz>
  * License: MIT
  */
 (function (window, angular, undefined) {
@@ -635,7 +635,7 @@
    * Selectbox component
    */
   .component('selectBox', {
-    template: '<div class="SelectBox {{$ctrl.selectBoxClass}}">\n      <div class="InputWrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <div class="Caret"\n          ng-class="{disabled: $ctrl.isDisabled}"\n          ng-click="$event.stopPropagation()"\n          ng-if="!$ctrl.hasSpinner"\n        ></div>\n        <input readonly class="Input {{$ctrl.inputClass}}" type="text"\n          ng-value="$ctrl.getSelectedLabel()"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n        <spinner class="Spinner--input" ng-if="$ctrl.hasSpinner"></spinner>\n      </div>\n      <ul class="SelectBox-options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
+    template: '<div class="SelectBox {{$ctrl.selectBoxClass}}">\n      <div class="InputWrapper is-clickable" ng-click="$ctrl.toggleOptions()">\n        <div class="Caret"\n          ng-class="{disabled: $ctrl.isDisabled}"\n          ng-click="$event.stopPropagation(); $ctrl.toggleOptions();"\n          ng-if="!$ctrl.hasSpinner"\n        ></div>\n        <input readonly class="Input {{$ctrl.inputClass}}" type="text"\n          ng-value="$ctrl.getSelectedLabel()"\n          ng-keydown="$ctrl.keydown($event)"\n          ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">\n        <spinner class="Spinner--input" ng-if="$ctrl.hasSpinner"></spinner>\n      </div>\n      <ul class="SelectBox-options" ng-show="$ctrl.isShowingOptions">\n        <li\n          ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"\n          ng-class="{selected: $ctrl.isSelection(-1)}"\n          ng-mouseover="$ctrl.setSelection(-1)"\n          ng-click="$ctrl.confirmSelection(-1); $event.preventDefault();"\n        >{{$ctrl.nullLabel}}</li>\n        <li\n          ng-transclude\n          ng-repeat="option in $ctrl.options"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index); $event.preventDefault();"\n        >{{$ctrl.getLabel(option)}}</li>\n      </ul>\n    </div>',
     transclude: true,
     require: {
       ngModel: 'ngModel'
