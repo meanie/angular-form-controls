@@ -193,7 +193,9 @@ angular.module('RadioButtons.Component', [])
       //Must have array as options
       if (!angular.isArray(this.options)) {
         if (typeof this.options === 'string') {
-          this.options = this.options.split('\n');
+          const options = this.options.split('\n');
+          const set = new Set(options);
+          this.options = Array.from(set.values());
         }
         else {
           this.options = [];
