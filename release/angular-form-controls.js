@@ -278,7 +278,9 @@
         //Must have array as options
         if (!angular.isArray(this.options)) {
           if (typeof this.options === 'string') {
-            this.options = this.options.split('\n');
+            var options = this.options.split('\n');
+            var set = new Set(options);
+            this.options = Array.from(set.values());
           } else {
             this.options = [];
           }
@@ -364,11 +366,12 @@
       /**
        * Check if an item value really changed (deep checking with angular.equals)
        */
+
       hasChanged: function hasChanged(changes) {
 
         //Get previous and current value
-        var previousValue = changes.previousValue,
-            currentValue = changes.currentValue;
+        var previousValue = changes.previousValue;
+        var currentValue = changes.currentValue;
 
         //If unitialized, don't trigger changes
 
@@ -561,7 +564,9 @@
         //Must have array as options
         if (!angular.isArray(this.options)) {
           if (typeof this.options === 'string') {
-            this.options = this.options.split('\n');
+            var options = this.options.split('\n');
+            var set = new Set(options);
+            this.options = Array.from(set.values());
           } else {
             this.options = [];
           }
@@ -1030,7 +1035,9 @@
         //Must have array as options
         if (!angular.isArray(this.options)) {
           if (typeof this.options === 'string') {
-            this.options = this.options.split('\n');
+            var options = this.options.split('\n');
+            var set = new Set(options);
+            this.options = Array.from(set.values());
           } else {
             this.options = [];
           }
