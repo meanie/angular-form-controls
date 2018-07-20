@@ -15,7 +15,7 @@ angular.module('TypeAhead.Component', [])
         ng-keyup="$ctrl.keyup($event)"
         ng-disabled="$ctrl.isDisabled"
         ng-model="$ctrl.searchQuery">
-      <spinner class="Spinner--input"></spinner>
+      <spinner class="Spinner--input" ng-if="$ctrl.isSearching"></spinner>
       <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">
         <li
           ng-repeat="item in $ctrl.results"
@@ -29,7 +29,6 @@ angular.module('TypeAhead.Component', [])
       </ul>
     </div>`,
   transclude: true,
-
   require: {
     ngModel: 'ngModel',
   },
@@ -38,6 +37,7 @@ angular.module('TypeAhead.Component', [])
     inputClass: '@',
     options: '<',
     placeholder: '@',
+    debounce: '<',
     onSearch: '&',
     onChange: '&',
     onQuery: '&',
@@ -60,7 +60,6 @@ angular.module('TypeAhead.Component', [])
     let $input, $container, $options;
     let $ctrl = this;
     let selectionIndex = -1;
-    let debounce = 100;
     let labelBy = $attrs.labelBy || null;
     let trackBy = $attrs.trackBy || null;
     let asObject = ($attrs.asObject === 'true');
@@ -77,7 +76,9 @@ angular.module('TypeAhead.Component', [])
       ESC: 27,
       SPACE: 32,
       TAB: 9,
+      LEFT: 37,
       UP: 38,
+      RIGHT: 39,
       DOWN: 40,
     };
 
@@ -86,7 +87,8 @@ angular.module('TypeAhead.Component', [])
      */
     function isControlInput(event) {
       let keys = [
-        KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB,
+        KeyCodes.UP, KeyCodes.DOWN, KeyCodes.LEFT, KeyCodes.RIGHT,
+        KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB,
       ];
       return (keys.indexOf(event.keyCode) > -1);
     }
@@ -142,8 +144,8 @@ angular.module('TypeAhead.Component', [])
         if ($ctrl.isNullable) {
           selectionIndex = -1;
         }
-        else if ($ctrl.options.length > 0) {
-          selectionIndex = $ctrl.options.length - 1;
+        else if ($ctrl.results.length > 0) {
+          selectionIndex = $ctrl.results.length - 1;
         }
       }
       else if (selectionIndex > ($ctrl.isNullable ? -1 : 0)) {
@@ -163,11 +165,11 @@ angular.module('TypeAhead.Component', [])
         if ($ctrl.isNullable) {
           selectionIndex = -1;
         }
-        else if ($ctrl.options.length > 0) {
+        else if ($ctrl.results.length > 0) {
           selectionIndex = 0;
         }
       }
-      else if (selectionIndex < ($ctrl.options.length - 1)) {
+      else if (selectionIndex < ($ctrl.results.length - 1)) {
         selectionIndex++;
       }
       if (oldIndex !== selectionIndex) {
@@ -434,6 +436,11 @@ angular.module('TypeAhead.Component', [])
       this.ngModel.$validate();
       this.ngModel.$setDirty();
 
+      //Cancel any old pending search
+      if (pendingSearch) {
+        $timeout.cancel(pendingSearch);
+      }
+
       //Should we search?
       if (!this.minLength || value.length >= this.minLength) {
         this.search(value);
@@ -457,7 +464,7 @@ angular.module('TypeAhead.Component', [])
       pendingSearch = $timeout(() => {
         pendingSearch = null;
         return this.doSearch(value);
-      }, debounce);
+      }, this.debounce || 250);
 
       //Return the promise
       return pendingSearch;
@@ -502,6 +509,7 @@ angular.module('TypeAhead.Component', [])
           if (results && results.length > 0) {
             this.isShowingResults = true;
           }
+          lastProcessedSearch = currentSearch;
         })
 
         //Done searching
