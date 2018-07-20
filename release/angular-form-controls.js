@@ -1292,9 +1292,8 @@
    * Type ahead component
    */
   .component('typeAhead', {
-    template: '<div class="TypeAhead {{$ctrl.typeAheadClass}}">\n      <input class="Input {{$ctrl.inputClass}}" type="text"\n        placeholder="{{$ctrl.placeholder}}"\n        ng-keydown="$ctrl.keydown($event)"\n        ng-keyup="$ctrl.keyup($event)"\n        ng-disabled="$ctrl.isDisabled"\n        ng-model="$ctrl.searchQuery">\n      <spinner class="Spinner--input"></spinner>\n      <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
+    template: '<div class="TypeAhead {{$ctrl.typeAheadClass}}">\n      <input class="Input {{$ctrl.inputClass}}" type="text"\n        placeholder="{{$ctrl.placeholder}}"\n        ng-keydown="$ctrl.keydown($event)"\n        ng-keyup="$ctrl.keyup($event)"\n        ng-disabled="$ctrl.isDisabled"\n        ng-model="$ctrl.searchQuery">\n      <spinner class="Spinner--input" ng-if="$ctrl.isSearching"></spinner>\n      <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">\n        <li\n          ng-repeat="item in $ctrl.results"\n          ng-class="{selected: $ctrl.isSelection($index)}"\n          ng-mouseover="$ctrl.setSelection($index)"\n          ng-click="$ctrl.confirmSelection($index)"\n          ng-transclude>\n          <span ng-bind-html="$ctrl.getLabel(item) |\n            markmatches:$ctrl.searchQuery:\'strong\'"></span>\n        </li>\n      </ul>\n    </div>',
     transclude: true,
-
     require: {
       ngModel: 'ngModel'
     },
@@ -1303,6 +1302,7 @@
       inputClass: '@',
       options: '<',
       placeholder: '@',
+      debounce: '<',
       onSearch: '&',
       onChange: '&',
       onQuery: '&',
@@ -1325,7 +1325,6 @@
           $options = void 0;
       var $ctrl = this;
       var selectionIndex = -1;
-      var debounce = 100;
       var labelBy = $attrs.labelBy || null;
       var trackBy = $attrs.trackBy || null;
       var asObject = $attrs.asObject === 'true';
@@ -1342,7 +1341,9 @@
         ESC: 27,
         SPACE: 32,
         TAB: 9,
+        LEFT: 37,
         UP: 38,
+        RIGHT: 39,
         DOWN: 40
       };
 
@@ -1350,7 +1351,7 @@
        * Check if input was control
        */
       function isControlInput(event) {
-        var keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB];
+        var keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.LEFT, KeyCodes.RIGHT, KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB];
         return keys.indexOf(event.keyCode) > -1;
       }
 
@@ -1403,8 +1404,8 @@
         if (typeof selectionIndex === 'undefined') {
           if ($ctrl.isNullable) {
             selectionIndex = -1;
-          } else if ($ctrl.options.length > 0) {
-            selectionIndex = $ctrl.options.length - 1;
+          } else if ($ctrl.results.length > 0) {
+            selectionIndex = $ctrl.results.length - 1;
           }
         } else if (selectionIndex > ($ctrl.isNullable ? -1 : 0)) {
           selectionIndex--;
@@ -1422,10 +1423,10 @@
         if (typeof selectionIndex === 'undefined') {
           if ($ctrl.isNullable) {
             selectionIndex = -1;
-          } else if ($ctrl.options.length > 0) {
+          } else if ($ctrl.results.length > 0) {
             selectionIndex = 0;
           }
-        } else if (selectionIndex < $ctrl.options.length - 1) {
+        } else if (selectionIndex < $ctrl.results.length - 1) {
           selectionIndex++;
         }
         if (oldIndex !== selectionIndex) {
@@ -1685,6 +1686,11 @@
         this.ngModel.$validate();
         this.ngModel.$setDirty();
 
+        //Cancel any old pending search
+        if (pendingSearch) {
+          $timeout.cancel(pendingSearch);
+        }
+
         //Should we search?
         if (!this.minLength || value.length >= this.minLength) {
           this.search(value);
@@ -1708,7 +1714,7 @@
         pendingSearch = $timeout(function () {
           pendingSearch = null;
           return _this.doSearch(value);
-        }, debounce);
+        }, this.debounce || 250);
 
         //Return the promise
         return pendingSearch;
@@ -1752,6 +1758,7 @@
           if (results && results.length > 0) {
             _this2.isShowingResults = true;
           }
+          lastProcessedSearch = currentSearch;
         })
 
         //Done searching
