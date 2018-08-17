@@ -629,7 +629,6 @@
 })(window, window.angular);
 (function (window, angular, undefined) {
   'use strict';
-
   /**
    * Module definition and dependencies
    */
@@ -665,8 +664,7 @@
       //Helper vars
       var $ctrl = this;
       var selectionIndex = void 0,
-          $input = void 0,
-          $container = void 0;
+          $input = void 0;
       var labelBy = $attrs.labelBy || null;
       var trackBy = $attrs.trackBy || null;
       var asObject = $attrs.asObject === 'true';
@@ -781,6 +779,11 @@
        */
       function ensureDropdownInView() {
 
+        //Only if open
+        if (!$ctrl.isShowingOptions) {
+          return;
+        }
+
         //Find scrollable parent
         var $parent = findScrollableParent($element);
         if (!$parent) {
@@ -788,6 +791,7 @@
         }
 
         //Get params
+        var $container = $input.parent().next();
         var offset = findOffset($container[0], $parent[0]);
         var height = $parent[0].clientHeight;
         var scroll = $parent[0].scrollTop;
@@ -816,6 +820,7 @@
         }
 
         //Find options
+        var $container = $input.parent().next();
         var $options = $container.children();
 
         //Get option now, taking into account the additional nullable element
@@ -1008,9 +1013,8 @@
         this.selectBoxClass = $element[0].className;
         $element[0].className = '';
 
-        //Find some elements
+        //Find input
         $input = $element.find('input');
-        $container = $input.parent().next();
 
         //Apply global click handler
         //NOTE: applied on body, so that it can prevent global $document handlers
@@ -1325,11 +1329,9 @@
     controller: ['$element', '$scope', '$formControls', '$attrs', '$log', '$q', '$timeout', '$document', function controller($element, $scope, $formControls, $attrs, $log, $q, $timeout, $document) {
 
       //Helper vars
-      var $input = void 0,
-          $container = void 0,
-          $options = void 0;
-      var $ctrl = this;
+      var $input = void 0;
       var selectionIndex = -1;
+      var $ctrl = this;
       var labelBy = $attrs.labelBy || null;
       var trackBy = $attrs.trackBy || null;
       var asObject = $attrs.asObject === 'true';
@@ -1385,6 +1387,10 @@
         if (!$ctrl.isNullable && selectionIndex < 0) {
           return;
         }
+
+        //Find options
+        var $container = $input.next().next();
+        var $options = $container.find('li');
 
         //Get option now, taking into account the additional nullable element
         var option = $options[selectionIndex + ($ctrl.isNullable ? 1 : 0)];
@@ -1565,8 +1571,6 @@
 
         //Find some elements
         $input = $element.find('input');
-        $container = $input.next().next();
-        $options = $container.find('li');
 
         //Propagate focus
         $element.attr('tabindex', -1);
