@@ -16,7 +16,7 @@ angular.module('TypeAhead.Component', [])
         ng-disabled="$ctrl.isDisabled"
         ng-model="$ctrl.searchQuery">
       <spinner class="Spinner--input" ng-if="$ctrl.isSearching"></spinner>
-      <ul class="TypeAhead-results" ng-show="$ctrl.isShowingResults">
+      <ul class="TypeAhead-results" ng-if="$ctrl.isShowingResults">
         <li
           ng-repeat="item in $ctrl.results"
           ng-class="{selected: $ctrl.isSelection($index)}"

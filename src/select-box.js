@@ -22,7 +22,7 @@ angular.module('SelectBox.Component', [])
           ng-class="{disabled: ($ctrl.isDisabled || $ctrl.hasSpinner)}">
         <spinner class="Spinner--input" ng-if="$ctrl.hasSpinner"></spinner>
       </div>
-      <ul class="SelectBox-options" ng-show="$ctrl.isShowingOptions">
+      <ul class="SelectBox-options" ng-if="$ctrl.isShowingOptions">
         <li
           ng-if="$ctrl.isNullable || !$ctrl.hasOptions()"
           ng-class="{selected: $ctrl.isSelection(-1)}"
