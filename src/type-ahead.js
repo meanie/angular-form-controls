@@ -109,6 +109,11 @@ angular.module('TypeAhead.Component', [])
      */
     function ensureSelectionInView() {
 
+      //Only if open
+      if (!$ctrl.isShowingResults) {
+        return;
+      }
+
       //Check index
       if (!$ctrl.isNullable && selectionIndex < 0) {
         return;
