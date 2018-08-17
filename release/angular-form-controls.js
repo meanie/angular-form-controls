@@ -805,6 +805,11 @@
        */
       function ensureSelectionInView() {
 
+        //Only if open
+        if (!$ctrl.isShowingOptions) {
+          return;
+        }
+
         //Check index
         if (!$ctrl.isNullable && selectionIndex < 0) {
           return;
@@ -1370,6 +1375,11 @@
        * Ensure the selected option is in view
        */
       function ensureSelectionInView() {
+
+        //Only if open
+        if (!$ctrl.isShowingResults) {
+          return;
+        }
 
         //Check index
         if (!$ctrl.isNullable && selectionIndex < 0) {
