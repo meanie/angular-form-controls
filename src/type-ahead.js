@@ -57,13 +57,13 @@ angular.module('TypeAhead.Component', [])
   ) {
 
     //Helper vars
-    let $input, $container, $options;
-    let $ctrl = this;
+    let $input;
     let selectionIndex = -1;
-    let labelBy = $attrs.labelBy || null;
-    let trackBy = $attrs.trackBy || null;
-    let asObject = ($attrs.asObject === 'true');
-    let allowNew = ($attrs.allowNew === 'true');
+    const $ctrl = this;
+    const labelBy = $attrs.labelBy || null;
+    const trackBy = $attrs.trackBy || null;
+    const asObject = ($attrs.asObject === 'true');
+    const allowNew = ($attrs.allowNew === 'true');
 
     //Keep track of searches, prevent older searches overwriting newer ones
     let currentSearch = 0;
@@ -86,7 +86,7 @@ angular.module('TypeAhead.Component', [])
      * Check if input was control
      */
     function isControlInput(event) {
-      let keys = [
+      const keys = [
         KeyCodes.UP, KeyCodes.DOWN, KeyCodes.LEFT, KeyCodes.RIGHT,
         KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB,
       ];
@@ -119,17 +119,21 @@ angular.module('TypeAhead.Component', [])
         return;
       }
 
+      //Find options
+      const $container = $input.next().next();
+      const $options = $container.find('li');
+
       //Get option now, taking into account the additional nullable element
-      let option = $options[selectionIndex + ($ctrl.isNullable ? 1 : 0)];
+      const option = $options[selectionIndex + ($ctrl.isNullable ? 1 : 0)];
       if (!option) {
         return;
       }
 
       //Determine container and element top and bottom
-      let cTop = $container[0].scrollTop;
-      let cBottom = cTop + $container[0].clientHeight;
-      let eTop = option.offsetTop;
-      let eBottom = eTop + option.clientHeight;
+      const cTop = $container[0].scrollTop;
+      const cBottom = cTop + $container[0].clientHeight;
+      const eTop = option.offsetTop;
+      const eBottom = eTop + option.clientHeight;
 
       //Check if out of view
       if (eTop < cTop) {
@@ -144,7 +148,7 @@ angular.module('TypeAhead.Component', [])
      * Move selection up
      */
     function moveSelectionUp() {
-      let oldIndex = selectionIndex;
+      const oldIndex = selectionIndex;
       if (typeof selectionIndex === 'undefined') {
         if ($ctrl.isNullable) {
           selectionIndex = -1;
@@ -165,7 +169,7 @@ angular.module('TypeAhead.Component', [])
      * Move selection down
      */
     function moveSelectionDown() {
-      let oldIndex = selectionIndex;
+      const oldIndex = selectionIndex;
       if (typeof selectionIndex === 'undefined') {
         if ($ctrl.isNullable) {
           selectionIndex = -1;
@@ -272,12 +276,12 @@ angular.module('TypeAhead.Component', [])
       }
 
       //Get the model value
-      let modelValue = getTrackingValue(model, model);
+      const modelValue = getTrackingValue(model, model);
 
       //Find matching option
       return options
         .find((option, index) => {
-          let optionValue = getTrackingValue(option, index);
+          const optionValue = getTrackingValue(option, index);
           return (modelValue === optionValue);
         });
     }
@@ -289,10 +293,10 @@ angular.module('TypeAhead.Component', [])
       if (!value) {
         return $q.resolve([]);
       }
-      let regex = new RegExp('(?:^|\\b)(' + value + ')', 'i');
-      let items = $ctrl.options
+      const regex = new RegExp('(?:^|\\b)(' + value + ')', 'i');
+      const items = $ctrl.options
         .filter(option => {
-          let label = getLabelValue(option);
+          const label = getLabelValue(option);
           return regex.test(label);
         });
       return $q.resolve(items);
@@ -305,8 +309,6 @@ angular.module('TypeAhead.Component', [])
 
       //Find some elements
       $input = $element.find('input');
-      $container = $input.next().next();
-      $options = $container.find('li');
 
       //Propagate focus
       $element.attr('tabindex', -1);
@@ -431,7 +433,7 @@ angular.module('TypeAhead.Component', [])
       }
 
       //Get search query
-      let value = (this.searchQuery || '').trim();
+      const value = (this.searchQuery || '').trim();
 
       //Call event handlers
       this.onQuery({value});
@@ -563,8 +565,8 @@ angular.module('TypeAhead.Component', [])
       this.hideResults();
 
       //Get the new model and label values
-      let value = getModelValue(option);
-      let label = getLabelValue(option);
+      const value = getModelValue(option);
+      const label = getLabelValue(option);
 
       //Set as search query
       this.searchQuery = label;

@@ -1,4 +1,3 @@
-
 /**
  * Module definition and dependencies
  */
@@ -63,7 +62,7 @@ angular.module('SelectBox.Component', [])
 
     //Helper vars
     const $ctrl = this;
-    let selectionIndex, $input, $container;
+    let selectionIndex, $input;
     let labelBy = $attrs.labelBy || null;
     let trackBy = $attrs.trackBy || null;
     let asObject = ($attrs.asObject === 'true');
@@ -176,6 +175,11 @@ angular.module('SelectBox.Component', [])
      */
     function ensureDropdownInView() {
 
+      //Only if open
+      if (!$ctrl.isShowingOptions) {
+        return;
+      }
+
       //Find scrollable parent
       const $parent = findScrollableParent($element);
       if (!$parent) {
@@ -183,6 +187,7 @@ angular.module('SelectBox.Component', [])
       }
 
       //Get params
+      const $container = $input.parent().next();
       const offset = findOffset($container[0], $parent[0]);
       const height = $parent[0].clientHeight;
       const scroll = $parent[0].scrollTop;
@@ -211,6 +216,7 @@ angular.module('SelectBox.Component', [])
       }
 
       //Find options
+      const $container = $input.parent().next();
       const $options = $container.children();
 
       //Get option now, taking into account the additional nullable element
@@ -409,9 +415,8 @@ angular.module('SelectBox.Component', [])
       this.selectBoxClass = $element[0].className;
       $element[0].className = '';
 
-      //Find some elements
+      //Find input
       $input = $element.find('input');
-      $container = $input.parent().next();
 
       //Apply global click handler
       //NOTE: applied on body, so that it can prevent global $document handlers
