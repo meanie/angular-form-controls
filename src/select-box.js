@@ -613,7 +613,7 @@ angular.module('SelectBox.Component', [])
       //Find matching option
       const option = this.options.find(option => {
         const label = getLabelValue(option);
-        return label.match(regex);
+        return String(label).match(regex);
       });
 
       //Match found?
