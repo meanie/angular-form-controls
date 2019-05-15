@@ -9,7 +9,7 @@ angular.module('CheckBox.Component', [])
  */
 .component('checkBox', {
   template:
-    `<label class="CheckBox"
+    `<label class="CheckBox {{$ctrl.classes}}"
       ng-transclude
       ng-click="$ctrl.toggle($event)"
       ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"
@@ -37,6 +37,10 @@ angular.module('CheckBox.Component', [])
      * On init
      */
     this.$onInit = function() {
+
+      //Propagate classes
+      this.classes = $element[0].className;
+      $element[0].className = '';
 
       //Add checkbox wrapper class to parent component
       $element.addClass('CheckBoxWrapper');
