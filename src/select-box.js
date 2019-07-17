@@ -69,13 +69,10 @@ angular.module('SelectBox.Component', [])
     let phrase = '';
 
     //Keycodes
-    const KeyCodes = {
-      ENTER: 13,
-      ESC: 27,
-      SPACE: 32,
-      UP: 38,
-      DOWN: 40,
-    };
+    const ENTER = 13;
+    const ESC = 27;
+    const UP = 38;
+    const DOWN = 40;
 
     /**
      * Debounce helper
@@ -498,7 +495,7 @@ angular.module('SelectBox.Component', [])
     this.keydown = function(event) {
 
       //Move selection up or down
-      if (event.keyCode === KeyCodes.UP) {
+      if (event.keyCode === UP) {
         event.preventDefault();
         if (this.isShowingOptions) {
           moveSelectionUp();
@@ -507,7 +504,7 @@ angular.module('SelectBox.Component', [])
           this.showOptions();
         }
       }
-      else if (event.keyCode === KeyCodes.DOWN) {
+      else if (event.keyCode === DOWN) {
         event.preventDefault();
         if (this.isShowingOptions) {
           moveSelectionDown();
@@ -518,19 +515,19 @@ angular.module('SelectBox.Component', [])
       }
 
       //Confirm selection
-      else if (event.keyCode === KeyCodes.ENTER && this.isShowingOptions) {
+      else if (event.keyCode === ENTER && this.isShowingOptions) {
         event.preventDefault();
         this.confirmSelection();
       }
 
       //Hide options
-      else if (event.keyCode === KeyCodes.ESC && this.isShowingOptions) {
+      else if (event.keyCode === ESC && this.isShowingOptions) {
         event.preventDefault();
         this.hideOptions();
       }
 
       //Show options
-      else if (event.keyCode === KeyCodes.ENTER && !this.isShowingOptions) {
+      else if (event.keyCode === ENTER && !this.isShowingOptions) {
         event.preventDefault();
         this.showOptions();
       }

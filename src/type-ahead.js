@@ -71,24 +71,27 @@ angular.module('TypeAhead.Component', [])
     let pendingSearch = null;
 
     //Keycodes
-    const KeyCodes = {
-      ENTER: 13,
-      ESC: 27,
-      SPACE: 32,
-      TAB: 9,
-      LEFT: 37,
-      UP: 38,
-      RIGHT: 39,
-      DOWN: 40,
-    };
+    const ENTER = 13;
+    const ESC = 27;
+    const TAB = 9;
+    const LEFT = 37;
+    const UP = 38;
+    const RIGHT = 39;
+    const DOWN = 40;
+    const SHIFT = 16;
+    const CTRL = 17;
+    const ALT = 18;
+    const CAPSLOCK = 20;
+    const CMDLEFT = 91;
+    const CMDRIGHT = 93;
 
     /**
      * Check if input was control
      */
     function isControlInput(event) {
       const keys = [
-        KeyCodes.UP, KeyCodes.DOWN, KeyCodes.LEFT, KeyCodes.RIGHT,
-        KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB,
+        UP, DOWN, LEFT, RIGHT, ENTER, ESC, TAB, SHIFT,
+        CTRL, ALT, CAPSLOCK, CMDLEFT, CMDRIGHT,
       ];
       return (keys.indexOf(event.keyCode) > -1);
     }
@@ -392,31 +395,31 @@ angular.module('TypeAhead.Component', [])
     this.keydown = function(event) {
 
       //Arrows up/down, move selection
-      if (this.isShowingResults && isControlInput(event)) {
-        if (event.keyCode === KeyCodes.UP) {
+      if (this.isShowingResults) {
+        if (event.keyCode === UP) {
           event.preventDefault();
           moveSelectionUp();
         }
-        else if (event.keyCode === KeyCodes.DOWN) {
+        else if (event.keyCode === DOWN) {
           event.preventDefault();
           moveSelectionDown();
         }
-        else if (event.keyCode === KeyCodes.ESC) {
+        else if (event.keyCode === ESC) {
           event.preventDefault();
           this.hideResults();
         }
-        else if (event.keyCode === KeyCodes.TAB) {
+        else if (event.keyCode === TAB) {
           //Don't prevent default
           this.hideResults();
         }
-        else if (event.keyCode === KeyCodes.ENTER) {
+        else if (event.keyCode === ENTER) {
           event.preventDefault();
           this.confirmSelection();
         }
       }
 
       //Show options
-      else if (event.keyCode === KeyCodes.ENTER) {
+      else if (event.keyCode === ENTER) {
         event.preventDefault();
         this.showResults();
       }
@@ -434,6 +437,14 @@ angular.module('TypeAhead.Component', [])
 
       //Get search query
       const value = (this.searchQuery || '').trim();
+
+      //Unchanged search query?
+      if (value === this.lastValue) {
+        return;
+      }
+
+      //Set new value
+      this.lastValue = value;
 
       //Call event handlers
       this.onQuery({value});
