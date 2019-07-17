@@ -1,7 +1,7 @@
 /**
  * @meanie/angular-form-controls * https://github.com/meanie/angular-form-controls
  *
- * Copyright (c) 2018 Adam Reis <adam@reis.nz>
+ * Copyright (c) 2019 Adam Reis <adam@reis.nz>
  * License: MIT
  */
 (function (window, angular, undefined) {
@@ -17,7 +17,7 @@
    * Checkbox component
    */
   .component('checkBox', {
-    template: '<label class="CheckBox"\n      ng-transclude\n      ng-click="$ctrl.toggle($event)"\n      ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"\n    ></label>',
+    template: '<label class="CheckBox {{$ctrl.classes}}"\n      ng-transclude\n      ng-click="$ctrl.toggle($event)"\n      ng-class="{checked: $ctrl.isChecked(), disabled: $ctrl.isDisabled}"\n    ></label>',
     require: {
       ngModel: 'ngModel'
     },
@@ -41,6 +41,10 @@
        * On init
        */
       this.$onInit = function () {
+
+        //Propagate classes
+        this.classes = $element[0].className;
+        $element[0].className = '';
 
         //Add checkbox wrapper class to parent component
         $element.addClass('CheckBoxWrapper');
@@ -366,11 +370,12 @@
       /**
        * Check if an item value really changed (deep checking with angular.equals)
        */
+
       hasChanged: function hasChanged(changes) {
 
         //Get previous and current value
-        var previousValue = changes.previousValue,
-            currentValue = changes.currentValue;
+        var previousValue = changes.previousValue;
+        var currentValue = changes.currentValue;
 
         //If unitialized, don't trigger changes
 
@@ -670,13 +675,10 @@
       var phrase = '';
 
       //Keycodes
-      var KeyCodes = {
-        ENTER: 13,
-        ESC: 27,
-        SPACE: 32,
-        UP: 38,
-        DOWN: 40
-      };
+      var ENTER = 13;
+      var ESC = 27;
+      var UP = 38;
+      var DOWN = 40;
 
       /**
        * Debounce helper
@@ -1090,14 +1092,14 @@
       this.keydown = function (event) {
 
         //Move selection up or down
-        if (event.keyCode === KeyCodes.UP) {
+        if (event.keyCode === UP) {
           event.preventDefault();
           if (this.isShowingOptions) {
             moveSelectionUp();
           } else {
             this.showOptions();
           }
-        } else if (event.keyCode === KeyCodes.DOWN) {
+        } else if (event.keyCode === DOWN) {
           event.preventDefault();
           if (this.isShowingOptions) {
             moveSelectionDown();
@@ -1107,19 +1109,19 @@
         }
 
         //Confirm selection
-        else if (event.keyCode === KeyCodes.ENTER && this.isShowingOptions) {
+        else if (event.keyCode === ENTER && this.isShowingOptions) {
             event.preventDefault();
             this.confirmSelection();
           }
 
           //Hide options
-          else if (event.keyCode === KeyCodes.ESC && this.isShowingOptions) {
+          else if (event.keyCode === ESC && this.isShowingOptions) {
               event.preventDefault();
               this.hideOptions();
             }
 
             //Show options
-            else if (event.keyCode === KeyCodes.ENTER && !this.isShowingOptions) {
+            else if (event.keyCode === ENTER && !this.isShowingOptions) {
                 event.preventDefault();
                 this.showOptions();
               }
@@ -1342,22 +1344,25 @@
       var pendingSearch = null;
 
       //Keycodes
-      var KeyCodes = {
-        ENTER: 13,
-        ESC: 27,
-        SPACE: 32,
-        TAB: 9,
-        LEFT: 37,
-        UP: 38,
-        RIGHT: 39,
-        DOWN: 40
-      };
+      var ENTER = 13;
+      var ESC = 27;
+      var TAB = 9;
+      var LEFT = 37;
+      var UP = 38;
+      var RIGHT = 39;
+      var DOWN = 40;
+      var SHIFT = 16;
+      var CTRL = 17;
+      var ALT = 18;
+      var CAPSLOCK = 20;
+      var CMDLEFT = 91;
+      var CMDRIGHT = 93;
 
       /**
        * Check if input was control
        */
       function isControlInput(event) {
-        var keys = [KeyCodes.UP, KeyCodes.DOWN, KeyCodes.LEFT, KeyCodes.RIGHT, KeyCodes.ENTER, KeyCodes.ESC, KeyCodes.TAB];
+        var keys = [UP, DOWN, LEFT, RIGHT, ENTER, ESC, TAB, SHIFT, CTRL, ALT, CAPSLOCK, CMDLEFT, CMDRIGHT];
         return keys.indexOf(event.keyCode) > -1;
       }
 
@@ -1652,27 +1657,27 @@
       this.keydown = function (event) {
 
         //Arrows up/down, move selection
-        if (this.isShowingResults && isControlInput(event)) {
-          if (event.keyCode === KeyCodes.UP) {
+        if (this.isShowingResults) {
+          if (event.keyCode === UP) {
             event.preventDefault();
             moveSelectionUp();
-          } else if (event.keyCode === KeyCodes.DOWN) {
+          } else if (event.keyCode === DOWN) {
             event.preventDefault();
             moveSelectionDown();
-          } else if (event.keyCode === KeyCodes.ESC) {
+          } else if (event.keyCode === ESC) {
             event.preventDefault();
             this.hideResults();
-          } else if (event.keyCode === KeyCodes.TAB) {
+          } else if (event.keyCode === TAB) {
             //Don't prevent default
             this.hideResults();
-          } else if (event.keyCode === KeyCodes.ENTER) {
+          } else if (event.keyCode === ENTER) {
             event.preventDefault();
             this.confirmSelection();
           }
         }
 
         //Show options
-        else if (event.keyCode === KeyCodes.ENTER) {
+        else if (event.keyCode === ENTER) {
             event.preventDefault();
             this.showResults();
           }
@@ -1690,6 +1695,14 @@
 
         //Get search query
         var value = (this.searchQuery || '').trim();
+
+        //Unchanged search query?
+        if (value === this.lastValue) {
+          return;
+        }
+
+        //Set new value
+        this.lastValue = value;
 
         //Call event handlers
         this.onQuery({ value: value });
