@@ -49,6 +49,7 @@ angular.module('SelectBox.Component', [])
     nullValue: '<',
     nullLabel: '<',
     inputClass: '@',
+    filter: '@',
     isDisabled: '<ngDisabled',
     hasSpinner: '<hasSpinner',
   },
@@ -57,7 +58,8 @@ angular.module('SelectBox.Component', [])
    * Component controller
    */
   controller(
-    $element, $attrs, $log, $formControls, $scope, $document, $timeout, $window
+    $element, $attrs, $log, $filter, $formControls, $scope,
+    $document, $timeout, $window
   ) {
 
     //Helper vars
@@ -344,8 +346,11 @@ angular.module('SelectBox.Component', [])
         return $ctrl.nullLabel;
       }
 
-      //Non object? Use its value
+      //Non object? Use its value, filtering if needed
       if (!angular.isObject(option)) {
+        if ($ctrl.$filter) {
+          return $ctrl.$filter(option);
+        }
         return option;
       }
 
@@ -361,7 +366,10 @@ angular.module('SelectBox.Component', [])
         return '';
       }
 
-      //Return the property
+      //Return the property, filtering if needed
+      if ($ctrl.$filter) {
+        return $ctrl.$filter(option[labelBy]);
+      }
       return option[labelBy];
     }
 
@@ -407,6 +415,11 @@ angular.module('SelectBox.Component', [])
 
       //Initialize flags
       this.isShowingOptions = false;
+
+      //Resolve filter
+      if (this.filter) {
+        this.$filter = $filter(this.filter);
+      }
 
       //Propagate classes
       this.selectBoxClass = $element[0].className;
