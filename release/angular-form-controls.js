@@ -656,6 +656,7 @@
       nullValue: '<',
       nullLabel: '<',
       inputClass: '@',
+      filter: '@',
       isDisabled: '<ngDisabled',
       hasSpinner: '<hasSpinner'
     },
@@ -663,7 +664,7 @@
     /**
      * Component controller
      */
-    controller: ['$element', '$attrs', '$log', '$formControls', '$scope', '$document', '$timeout', '$window', function controller($element, $attrs, $log, $formControls, $scope, $document, $timeout, $window) {
+    controller: ['$element', '$attrs', '$log', '$filter', '$formControls', '$scope', '$document', '$timeout', '$window', function controller($element, $attrs, $log, $filter, $formControls, $scope, $document, $timeout, $window) {
 
       //Helper vars
       var $ctrl = this;
@@ -947,8 +948,11 @@
           return $ctrl.nullLabel;
         }
 
-        //Non object? Use its value
+        //Non object? Use its value, filtering if needed
         if (!angular.isObject(option)) {
+          if ($ctrl.$filter) {
+            return $ctrl.$filter(option);
+          }
           return option;
         }
 
@@ -964,7 +968,10 @@
           return '';
         }
 
-        //Return the property
+        //Return the property, filtering if needed
+        if ($ctrl.$filter) {
+          return $ctrl.$filter(option[labelBy]);
+        }
         return option[labelBy];
       }
 
@@ -1009,6 +1016,11 @@
 
         //Initialize flags
         this.isShowingOptions = false;
+
+        //Resolve filter
+        if (this.filter) {
+          this.$filter = $filter(this.filter);
+        }
 
         //Propagate classes
         this.selectBoxClass = $element[0].className;
