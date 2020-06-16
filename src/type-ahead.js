@@ -38,6 +38,7 @@ angular.module('TypeAhead.Component', [])
     options: '<',
     placeholder: '@',
     debounce: '<',
+    clearInput: '<',
     onSearch: '&',
     onChange: '&',
     onQuery: '&',
@@ -53,7 +54,7 @@ angular.module('TypeAhead.Component', [])
    * Component controller
    */
   controller(
-    $element, $scope, $formControls, $attrs, $log, $q, $timeout, $document
+    $element, $scope, $formControls, $attrs, $log, $q,, $timeout, $document
   ) {
 
     //Helper vars
@@ -372,6 +373,9 @@ angular.module('TypeAhead.Component', [])
           if (option) {
             this.searchQuery = getLabelValue(option);
           }
+        }
+        else if (this.clearInput) {
+          this.searchQuery = '';
         }
 
         //Validate model
