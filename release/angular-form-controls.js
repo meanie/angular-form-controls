@@ -370,12 +370,11 @@
       /**
        * Check if an item value really changed (deep checking with angular.equals)
        */
-
       hasChanged: function hasChanged(changes) {
 
         //Get previous and current value
-        var previousValue = changes.previousValue;
-        var currentValue = changes.currentValue;
+        var previousValue = changes.previousValue,
+            currentValue = changes.currentValue;
 
         //If unitialized, don't trigger changes
 
@@ -1325,6 +1324,7 @@
       options: '<',
       placeholder: '@',
       debounce: '<',
+      clearInput: '<',
       onSearch: '&',
       onChange: '&',
       onQuery: '&',
@@ -1646,6 +1646,8 @@
             if (option) {
               this.searchQuery = getLabelValue(option);
             }
+          } else if (this.clearInput) {
+            this.searchQuery = '';
           }
 
           //Validate model
