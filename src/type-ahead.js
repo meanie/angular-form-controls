@@ -54,7 +54,7 @@ angular.module('TypeAhead.Component', [])
    * Component controller
    */
   controller(
-    $element, $scope, $formControls, $attrs, $log, $q,, $timeout, $document
+    $element, $scope, $formControls, $attrs, $log, $q, $timeout, $document
   ) {
 
     //Helper vars
