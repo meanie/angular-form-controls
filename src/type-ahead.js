@@ -357,6 +357,16 @@ angular.module('TypeAhead.Component', [])
      */
     this.$onChanges = function(changes) {
 
+      //Clear search query if we get a clear input change
+      //NOTE: This is a small hack to fix the issue we were having with
+      //the whole search query being cleared when the address model was
+      //invalidated. We want to persist the search query if someone types
+      //their address and tries to change it, yet we do need a method of
+      //properly clearing the address input as well, hence this hack.
+      if (changes.clearInput) {
+        this.searchQuery = '';
+      }
+
       //Validate and mark as dirty if needed
       if (changes.model) {
 
@@ -373,9 +383,6 @@ angular.module('TypeAhead.Component', [])
           if (option) {
             this.searchQuery = getLabelValue(option);
           }
-        }
-        else if (this.clearInput) {
-          this.searchQuery = '';
         }
 
         //Validate model
