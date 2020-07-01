@@ -25,6 +25,7 @@ angular.module('CheckBoxes.Component', [])
     min: '<',
     max: '<',
     onChange: '&',
+    single: '<',
     isDisabled: '<ngDisabled',
   },
 
@@ -240,6 +241,9 @@ angular.module('CheckBoxes.Component', [])
           return (modelValue === optionValue);
         });
         value.splice(i, 1);
+      }
+      else if (this.single) {
+        value = [asObject ? option : optionValue];
       }
       else {
         value.push(asObject ? option : optionValue);
