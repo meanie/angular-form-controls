@@ -13,7 +13,7 @@ angular.module('CheckBoxes.Component', [])
       <label class="CheckBox"
         ng-repeat="option in $ctrl.options"
         ng-click="$ctrl.toggle(option, $index)"
-        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"
+        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: ($ctrl.isDisabled || $ctrl.isOptionDisabled(option, $index))}"
       >{{$ctrl.getLabel(option)}}</label>
     </div>`,
   require: {
@@ -27,6 +27,7 @@ angular.module('CheckBoxes.Component', [])
     onChange: '&',
     single: '<',
     isDisabled: '<ngDisabled',
+    disabledValues: '<',
   },
 
   /**
@@ -215,12 +216,23 @@ angular.module('CheckBoxes.Component', [])
     };
 
     /**
+     * Check if an option is disabled
+     */
+    this.isOptionDisabled = function(option, index) {
+      if (!this.disabledValues || !Array.isArray(this.disabledValues)) {
+        return false;
+      }
+      const value = getTrackingValue(option, index);
+      return this.disabledValues.includes(value);
+    };
+
+    /**
      * Toggle an option
      */
     this.toggle = function(option, index) {
 
       //Ignore when disabled
-      if (this.isDisabled) {
+      if (this.isDisabled || this.isOptionDisabled(option, index)) {
         return;
       }
 
