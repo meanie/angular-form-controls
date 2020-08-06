@@ -117,7 +117,7 @@
    * Checkboxes component
    */
   .component('checkBoxes', {
-    template: '<div class="CheckBoxGroup {{$ctrl.classes}}">\n      <label class="CheckBox"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.toggle(option, $index)"\n        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: $ctrl.isDisabled}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
+    template: '<div class="CheckBoxGroup {{$ctrl.classes}}">\n      <label class="CheckBox"\n        ng-repeat="option in $ctrl.options"\n        ng-click="$ctrl.toggle(option, $index)"\n        ng-class="{checked: $ctrl.isChecked(option, $index), disabled: ($ctrl.isDisabled || $ctrl.isOptionDisabled(option, $index))}"\n      >{{$ctrl.getLabel(option)}}</label>\n    </div>',
     require: {
       ngModel: 'ngModel'
     },
@@ -127,7 +127,9 @@
       min: '<',
       max: '<',
       onChange: '&',
-      isDisabled: '<ngDisabled'
+      single: '<',
+      isDisabled: '<ngDisabled',
+      disabledValues: '<'
     },
 
     /**
@@ -314,12 +316,23 @@
       };
 
       /**
+       * Check if an option is disabled
+       */
+      this.isOptionDisabled = function (option, index) {
+        if (!this.disabledValues || !Array.isArray(this.disabledValues)) {
+          return false;
+        }
+        var value = getTrackingValue(option, index);
+        return this.disabledValues.includes(value);
+      };
+
+      /**
        * Toggle an option
        */
       this.toggle = function (option, index) {
 
         //Ignore when disabled
-        if (this.isDisabled) {
+        if (this.isDisabled || this.isOptionDisabled(option, index)) {
           return;
         }
 
@@ -342,6 +355,8 @@
             return modelValue === optionValue;
           });
           value.splice(i, 1);
+        } else if (this.single) {
+          value = [asObject ? option : optionValue];
         } else {
           value.push(asObject ? option : optionValue);
         }
