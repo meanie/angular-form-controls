@@ -21,7 +21,8 @@ angular.module('CheckBox.Component', [])
   bindings: {
     model: '<ngModel',
     onChange: '&',
-    isInverse: '<isInverse',
+    isInverse: '<',
+    isUndefined: '<',
     isDisabled: '<ngDisabled',
   },
 
@@ -86,8 +87,13 @@ angular.module('CheckBox.Component', [])
         return;
       }
 
-      //Get boolean value and call on change handler
+      //Determine value
       let value = !this.model;
+      if (this.isUndefined && value === false) {
+        value = undefined;
+      }
+
+      //Call on change handler
       this.onChange({value});
     };
 
