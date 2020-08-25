@@ -25,7 +25,8 @@
     bindings: {
       model: '<ngModel',
       onChange: '&',
-      isInverse: '<isInverse',
+      isInverse: '<',
+      isUndefined: '<',
       isDisabled: '<ngDisabled'
     },
 
@@ -90,8 +91,13 @@
           return;
         }
 
-        //Get boolean value and call on change handler
+        //Determine value
         var value = !this.model;
+        if (this.isUndefined && value === false) {
+          value = undefined;
+        }
+
+        //Call on change handler
         this.onChange({ value: value });
       };
 
